@@ -104,6 +104,14 @@ public class Util
         {
             return numbers.Min();
         }
+        public static int Max(params int[] numbers)
+        {
+            return numbers.Max();
+        }
+        public static double Max(params double[] numbers)
+        {
+            return numbers.Max();
+        }
 
         public static Dictionary<string, int> GetGitCommitCounts()
         {
