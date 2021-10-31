@@ -6,9 +6,15 @@ namespace ArcaneLibs
     public class Timing
     {
         public bool PrintTimings;
+
         public Stopwatch StartTiming(string name)
         {
-            Stopwatch sw = Timings.GetOrAdd(name, (_) => { Stopwatch lsw = new Stopwatch(); lsw.Start(); return lsw; });
+            Stopwatch sw = Timings.GetOrAdd(name, (_) =>
+            {
+                Stopwatch lsw = new Stopwatch();
+                lsw.Start();
+                return lsw;
+            });
             sw.Reset();
             sw.Start();
             if (PrintTimings)
@@ -37,6 +43,7 @@ namespace ArcaneLibs
             }).Start();
             return sw;
         }
+
         public Stopwatch StopTiming(string name)
         {
             if (!Timings.TryGetValue(name, out Stopwatch sw))
@@ -52,14 +59,16 @@ namespace ArcaneLibs
 
             return sw;
         }
+
         public List<Stopwatch> StopTimingAll(string name)
         {
             List<Stopwatch> sws = new();
-            foreach (var sw in Timings.Where(x => x.Key.StartsWith(name))) 
+            foreach (var sw in Timings.Where(x => x.Key.StartsWith(name)))
                 sws.Add(StopTiming(sw.Key));
             Console.WriteLine($"Stopped {sws.Count} timings in {name}.");
             return sws;
         }
+
         public Stopwatch GotoNext(Stopwatch old, string name, bool muted = false)
         {
             old.Stop();
@@ -68,11 +77,17 @@ namespace ArcaneLibs
                 Console.WriteLine($"Stopped timer {Timings.FirstOrDefault(x => x.Value == old).Key}: {old.ElapsedMilliseconds} ms, moving on to {name}.");
             }
 
-            Stopwatch sw = Timings.GetOrAdd(name, (_) => { Stopwatch lsw = new Stopwatch(); lsw.Start(); return lsw; });
+            Stopwatch sw = Timings.GetOrAdd(name, (_) =>
+            {
+                Stopwatch lsw = new Stopwatch();
+                lsw.Start();
+                return lsw;
+            });
             sw.Reset();
             sw.Start();
             return sw;
         }
+
         public Stopwatch StopTiming(Stopwatch old)
         {
             old.Stop();
@@ -83,6 +98,7 @@ namespace ArcaneLibs
 
             return old;
         }
+
         public Stopwatch Fail(string name)
         {
             if (!Timings.TryGetValue(name, out Stopwatch sw))

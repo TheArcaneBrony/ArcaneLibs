@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -14,6 +13,7 @@ namespace ArcaneLibs
         {
             return str.ToLower().Contains(test);
         }
+
         public static bool ContainsAnyOf(this string str, IEnumerable<string> test) //check if string contains any lowercase instance of any item
         {
             foreach (string item in test)
@@ -23,8 +23,10 @@ namespace ArcaneLibs
                     return true;
                 }
             }
+
             return false;
         }
+
         public static bool MatchesAny(this string str, IEnumerable<string> regex, RegexOptions options) //check if string contains any lowercase instance of any item
         {
             foreach (string item in regex)
@@ -35,8 +37,10 @@ namespace ArcaneLibs
                     return true;
                 }
             }
+
             return false;
         }
+
         public static bool StartsWithAnyOf(this string str, IEnumerable<string> test) //check if string starts with any lowercase instance of any item
         {
             foreach (string item in test)
@@ -46,27 +50,10 @@ namespace ArcaneLibs
                     return true;
                 }
             }
+
             return false;
         }
-        public static void Log(this Exception e) //log errors
-        {
-            try
-            {
-                Debug.WriteLine(e);
-            }
-            catch
-            {
-                try
-                {
-                    Debug.WriteLine(e);
-                }
-                catch
-                {
-                    Console.WriteLine("Excuse me what the fuck? Failed to send error");
-                    Debug.WriteLine(e);
-                }
-            }
-        }
+
         public static string ContentOrEmtpy(this string str) //check empty string if null
         {
             if (string.IsNullOrEmpty(str))
@@ -77,10 +64,6 @@ namespace ArcaneLibs
             return str;
         }
 
-        public static void SetStatus(string status)
-        {
-            //Console.Title = $"{(bot.Name ?? "Unknown bot")} | {Status} | Uptime since event start: {(DateTime.Now - Process.GetCurrentProcess().StartTime).TotalMilliseconds} ms";
-        }
         public static void SaveToJsonFile(this object @object, string filename) // save object to json file
         {
             JsonSerializerSettings settings = new JsonSerializerSettings()
@@ -109,10 +92,12 @@ namespace ArcaneLibs
                 // ignored
             }
         }
+
         public static int CountInstances(this string haystack, string needle)
         {
             return haystack.Select((_, i) => haystack[i..]).Count(sub => sub.StartsWith(needle));
         }
+
         public static int CountInstancesOfAll(this string haystack, IEnumerable<string> needles)
         {
             int instances = 0;
@@ -123,14 +108,17 @@ namespace ArcaneLibs
 
             return instances;
         }
+
         public static string Toggle(this ref bool @bool)
         {
             return (@bool ^= true) ? "enabled" : "disabled";
         }
+
         public static (bool, string) ToggleAlt(this bool @bool)
         {
             return (@bool ^= true, @bool ? "enabled" : "disabled");
         }
+
         public static string RemoveDiacritics(this string text)
         {
             string normalizedString = text.Normalize(NormalizationForm.FormD);
@@ -147,6 +135,7 @@ namespace ArcaneLibs
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
+
         public static string ToAlphaNumeric(this string text)
         {
             return text.Unidecode();
@@ -168,17 +157,34 @@ namespace ArcaneLibs
                 }
             }
         }
+
         public static void RemoveAll<K, V>(this IDictionary<K, V> dict, Func<K, V, bool> match)
         {
             foreach (var key in dict.Keys.ToArray()
-                .Where(key => match(key, dict[key])))
+                         .Where(key => match(key, dict[key])))
                 dict.Remove(key);
         }
+
         public static T[] AddToArray<T>(this T[] array, T item)
         {
             Array.Resize(ref array, array.Length + 1);
             array[^1] = item;
             return array;
+        }
+        
+        public static string TimeSinceFormatted(this DateTimeOffset dto)
+        {
+            TimeSpan ts = DateTime.Now - dto;
+            return ts.TimeSinceFormatted();
+        }
+        public static string TimeSinceFormatted(this TimeSpan timeSpan)
+        {
+            string formatted = "";
+            if (timeSpan.Days > 0) formatted += $"{timeSpan.Days}.";
+            if (timeSpan.TotalHours > 0) formatted += $"{timeSpan.Hours:00}:";
+            if (timeSpan.TotalMinutes > 0) formatted += $"{timeSpan.Minutes:00}{(timeSpan.Seconds%2==1?".":":")}";
+            if (timeSpan.TotalSeconds > 0) formatted += $"{timeSpan.Seconds:00}";
+            return formatted;
         }
     }
 }

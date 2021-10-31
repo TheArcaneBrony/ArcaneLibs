@@ -13,6 +13,5 @@ public class UnitTest1
         Assert.Equal(6, Util.Max(2, 4, 6));
         Assert.Equal(2d, Util.Min(2d, 4d, 6d));
         Assert.Equal(6d, Util.Max(2d, 4d, 6d));
-        
     }
 }
