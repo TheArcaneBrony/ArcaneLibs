@@ -163,4 +163,51 @@ public class Util
             if (!Directory.Exists(dir)) return 0;
             return Directory.GetDirectories(dir).Sum(GetDirSizeRecursive) + Directory.GetFiles(dir).Sum(x => new FileInfo(x).Length);
         }
+        public static void RunCommandSync(string command, string args = "", bool silent = false)
+        {
+            RunCommandInDirSync(Environment.CurrentDirectory, command, args, silent);
+        }
+        public static void RunCommandInDirSync(string path, string command, string args = "", bool silent = false)
+        {
+            Process.Start(new ProcessStartInfo()
+            {
+                WorkingDirectory = path,
+                FileName = command,
+                Arguments = args,
+                RedirectStandardOutput = !silent
+            })?.WaitForExit();
+        }
+
+        public static string GetCommandOutputSync(string command, string args = "", bool silent = true)
+        {
+            return GetCommandOutputInDirSync(Environment.CurrentDirectory, command, args, silent);
+        }
+
+        public static string GetCommandOutputInDirSync(string path, string command, string args = "", bool silent = true)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo(command, args)
+            {
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                WorkingDirectory = path
+            };
+            Process proc = Process.Start(psi);
+            string output = "";
+            while (!proc.StandardOutput.EndOfStream)
+            {
+                string line = proc.StandardOutput.ReadLine() ?? "";
+                output += line + "\n";
+            }
+            return output;
+        }
+        public static String BytesToString(long byteCount, int maxnums = 2)
+        {
+            string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+            if (byteCount == 0)
+                return "0 " + suf[0];
+            long bytes = Math.Abs(byteCount);
+            int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+            double num = Math.Round(bytes / Math.Pow(1024, place), maxnums);
+            return (Math.Sign(byteCount) * num) + " " + suf[place];
+        }
 }
