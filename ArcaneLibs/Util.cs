@@ -158,4 +158,9 @@ public class Util
 
             return false;
         }
+        public static long GetDirSizeRecursive(string dir)
+        {
+            if (!Directory.Exists(dir)) return 0;
+            return Directory.GetDirectories(dir).Sum(GetDirSizeRecursive) + Directory.GetFiles(dir).Sum(x => new FileInfo(x).Length);
+        }
 }
