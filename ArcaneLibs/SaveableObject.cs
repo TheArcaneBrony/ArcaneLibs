@@ -20,7 +20,6 @@ public class SaveableObject<T> where T : new() {
     {
         if (filename == "") {
             Type callerType = typeof(T);
-            Console.WriteLine(callerType.Name);
             filename = callerType.Name + ".json";
         }
 

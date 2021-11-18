@@ -28,7 +28,7 @@ public class LogManager
     {
         foreach (var endpoint in _endpoints)
         {
-            endpoint.Write(LogTime ? $"[{DateTime.Now:hh:mm:ss}]" : "" + $"{Prefix}{Path.GetFileName(file)}:{line} {MessagePrefix}{message}");
+            endpoint.Write((LogTime ? $"[{DateTime.Now:hh:mm:ss}]" : "") + $"{Prefix}{Path.GetFileName(file)}:{line} {MessagePrefix}{message}");
         }
     }
 
