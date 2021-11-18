@@ -2,6 +2,7 @@
 
 using ArcaneLibs.Logging;
 using ArcaneLibs.Logging.LogEndpoints;
+using ArcaneLibs.UsageTest;
 
 Console.WriteLine("Hello, World!");
 //create logs
@@ -19,3 +20,10 @@ log2.Log("debug log");
 log2.LogDebug("debug dbg log");
 log3.Log("file log");
 log3.LogDebug("file dbg log");
+
+Config myConfig = Config.Read();
+Console.WriteLine(myConfig.SomeNumber);
+myConfig.SomeNumber = 5;
+myConfig.Save();
+myConfig = Config.Read();
+Console.WriteLine(myConfig.SomeNumber);
