@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System;
 using ArcaneLibs.Logging;
 using ArcaneLibs.Logging.LogEndpoints;
 using ArcaneLibs.UsageTest;
@@ -21,9 +22,11 @@ log2.LogDebug("debug dbg log");
 log3.Log("file log");
 log3.LogDebug("file dbg log");
 
-Config myConfig = Config.Read();
-Console.WriteLine(myConfig.SomeNumber);
-myConfig.SomeNumber = 5;
-myConfig.Save();
-myConfig = Config.Read();
-Console.WriteLine(myConfig.SomeNumber);
+for (int i = 0; i < 5; i++) {
+    Config myConfig = Config.Read();
+    Console.WriteLine(myConfig.SomeNumber);
+    myConfig.SomeNumber = i;
+    myConfig.Save();
+    myConfig = Config.Read();
+    Console.WriteLine(myConfig.SomeNumber);
+}
