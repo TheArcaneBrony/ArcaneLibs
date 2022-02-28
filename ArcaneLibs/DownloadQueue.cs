@@ -5,7 +5,7 @@ namespace ArcaneLibs;
 
 public class DownloadQueue {
     public List<DownloadInfo> queue = new();
-    List<DownloadInfo> running => queue.Where(x => x.Running).ToList();
+    public List<DownloadInfo> running => queue.Where(x => x.Running).ToList();
 
     public void Add(DownloadInfo info) => queue.Add(info);
 
@@ -51,11 +51,11 @@ public class DownloadInfo {
     public string Url = "";
     public long Size = 0;
 
-    internal bool Running = false;
+    public bool Running = false;
     public string TargetFilename => Url.Split("/").Last();
-    internal long BytesDownloaded = 0;
-    internal float Progress => (float)(BytesDownloaded / (double)Size);
-    internal int ProgressInt => (int)Math.Max(0, Math.Min(Progress * 100, 100));
+    public long BytesDownloaded = 0;
+    public float Progress => (float)(BytesDownloaded / (double)Size);
+    public int ProgressInt => (int)Math.Max(0, Math.Min(Progress * 100, 100));
 
     internal void StartDownload() {
         Running = true;
