@@ -1,3 +1,4 @@
+using System.Data.SqlTypes;
 using System.Net;
 
 namespace ArcaneLibs;
@@ -13,7 +14,8 @@ public class DownloadQueue {
 
     public bool AllDownloadsFinished => !queue.Any(x => x.Progress < 1);
     private int maxWidth => queue.Max(x=>x.FileName.Length);
-
+    public Func<DownloadQueue, bool> ShouldQueueMore = (q) => q.running.Count >= q.MaxConcurrentDownloads;
+    
     public async Task Run() {
         foreach (var n in queue.Where(x=>x.Size == 0)) {
             File.Create(n.TargetFile).Close();
@@ -21,7 +23,7 @@ public class DownloadQueue {
 
         queue.RemoveAll(x => x.Size == 0);
         while (!AllDownloadsFinished || UpdatingQueue) {
-            while (running.Count >= MaxConcurrentDownloads) {
+            while (!ShouldQueueMore(this)) {
                 // Console.Clear();
                 // Console.WriteLine(GetProgressBars());
                 await Task.Delay(10);
