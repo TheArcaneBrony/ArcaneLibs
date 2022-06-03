@@ -1,6 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System;
+using System.Drawing;
+using ArcaneLibs;
+using ArcaneLibs.Collections;
 using ArcaneLibs.Logging;
 using ArcaneLibs.Logging.LogEndpoints;
 using ArcaneLibs.UsageTest;
@@ -30,3 +33,25 @@ for (int i = 0; i < 5; i++) {
     myConfig = Config.Read();
     Console.WriteLine(myConfig.SomeNumber);
 }
+
+Console.Write("Expected: ");
+for (int i = 0; i < 5; i++)
+{
+    Console.Write($"{MathUtil.Map(i, 0, 5, 0, 25)} ");
+}
+Console.Write("\nReversed: ");
+for (int i = 0; i < 5; i++)
+{
+    Console.Write($"{MathUtil.Map(i, 0, 5, 25, 0)} ");
+}
+
+var autodict = new AutoPopulatingDictionary<int, String>();
+var autodict2 = new AutoPopulatingDictionary<int, Config>();
+var autodict3 = new AutoPopulatingDictionary<int, Point>();
+
+var a = autodict[3];
+var b = autodict2[5];
+var c = autodict3[6];
+
+return;
+
