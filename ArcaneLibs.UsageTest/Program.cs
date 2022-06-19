@@ -33,7 +33,7 @@ for (int i = 0; i < 5; i++) {
     myConfig = Config.Read();
     Console.WriteLine(myConfig.SomeNumber);
 }
-
+/*
 Console.Write("Expected: ");
 for (int i = 0; i < 5; i++)
 {
@@ -44,7 +44,7 @@ for (int i = 0; i < 5; i++)
 {
     Console.Write($"{MathUtil.Map(i, 0, 5, 25, 0)} ");
 }
-
+*/
 var autodict = new AutoPopulatingDictionary<int, String>();
 var autodict2 = new AutoPopulatingDictionary<int, Config>();
 var autodict3 = new AutoPopulatingDictionary<int, Point>();
@@ -53,5 +53,8 @@ var a = autodict[3];
 var b = autodict2[5];
 var c = autodict3[6];
 
-return;
+//return;
+
+Console.WriteLine(Util.GetCommandOutputSync("bash", "-c asdf"));
+Console.WriteLine(Util.GetCommandOutputSync("bash", "-c ls"));
 

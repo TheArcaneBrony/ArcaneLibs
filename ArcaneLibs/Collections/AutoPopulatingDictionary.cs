@@ -20,7 +20,6 @@ public class AutoPopulatingDictionary<T1,T2> : Dictionary<T1, T2>
         get
         {
             var a = typeof(T2).GetConstructors();
-            Console.WriteLine(typeof(T2).GetConstructors());
             if (!_backingStore.ContainsKey(key))
             {
                 _backingStore.Add(key, GetNewInstance.Invoke());
@@ -34,7 +33,7 @@ public class AutoPopulatingDictionary<T1,T2> : Dictionary<T1, T2>
         }
     }
 
-    private unsafe Func<T2> GetNewInstance = () =>
+    private Func<T2> GetNewInstance = () =>
     {
         if (typeof(T2) == typeof(string))
         {

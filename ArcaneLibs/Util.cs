@@ -197,17 +197,26 @@ public class Util
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true,
+            RedirectStandardError = true,
             WorkingDirectory = path
         };
         Process proc = Process.Start(psi);
         string output = "";
-        while (!proc.StandardOutput.EndOfStream)
+        while (!proc.StandardOutput.EndOfStream || !proc.StandardError.EndOfStream)
         {
-            string line = proc.StandardOutput.ReadLine() ?? "";
-            output += line + "\n";
+            if (!proc.StandardOutput.EndOfStream)
+            {
+                string line = proc.StandardOutput.ReadLine() ?? "";
+                output += line + "\n";
+            }
+            if (!proc.StandardError.EndOfStream)
+            {
+                string line = proc.StandardError.ReadLine() ?? "";
+                output += line + "\n";
+            }
         }
 
-        return output;
+        return output.TrimEnd('\n');
     }
 
     public static String BytesToString(long byteCount, int maxnums = 2)
