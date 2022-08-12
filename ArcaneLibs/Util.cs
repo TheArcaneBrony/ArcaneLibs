@@ -229,4 +229,15 @@ public class Util
         double num = Math.Round(bytes / Math.Pow(1024, place), maxnums);
         return (Math.Sign(byteCount) * num) + " " + suf[place];
     }
-}
+    
+    public static String SI_BytesToString(long byteCount, int maxnums = 2)
+    {
+        string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+        if (byteCount == 0)
+            return "0 " + suf[0];
+        long bytes = Math.Abs(byteCount);
+        int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1000)));
+        double num = Math.Round(bytes / Math.Pow(1000, place), maxnums);
+        return (Math.Sign(byteCount) * num) + " " + suf[place];
+    }
+}       
