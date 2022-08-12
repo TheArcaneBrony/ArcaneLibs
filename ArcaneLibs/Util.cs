@@ -221,7 +221,7 @@ public class Util
 
     public static String BytesToString(long byteCount, int maxnums = 2)
     {
-        string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+        string[] suf = { "B", "kiB", "MiB", "GiB", "TiB", "PiB", "EiB" }; //Longs run out around EB
         if (byteCount == 0)
             return "0 " + suf[0];
         long bytes = Math.Abs(byteCount);
@@ -232,7 +232,7 @@ public class Util
     
     public static String SI_BytesToString(long byteCount, int maxnums = 2)
     {
-        string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+        string[] suf = { "B", "kB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
         if (byteCount == 0)
             return "0 " + suf[0];
         long bytes = Math.Abs(byteCount);
