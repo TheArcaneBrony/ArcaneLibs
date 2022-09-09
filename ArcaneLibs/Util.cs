@@ -78,7 +78,10 @@ public class Util
         }
 
         if (printProgress)
-            wc.DownloadProgressChanged += (_, args) => { Console.Write($"Downloading {contextName}... {args.ProgressPercentage}%\r"); };
+            wc.DownloadProgressChanged += (_, args) =>
+            {
+                Console.Write($"Downloading {contextName}... {args.ProgressPercentage}%\r");
+            };
         wc.DownloadFileCompleted += (_, _) =>
         {
             //Console.WriteLine(printProgress?"\n":"" + $"Finished downloading {contextName}");
@@ -167,7 +170,8 @@ public class Util
     public static long GetDirSizeRecursive(string dir)
     {
         if (!Directory.Exists(dir)) return 0;
-        return Directory.GetDirectories(dir).Sum(GetDirSizeRecursive) + Directory.GetFiles(dir).Sum(x => new FileInfo(x).Length);
+        return Directory.GetDirectories(dir).Sum(GetDirSizeRecursive) +
+               Directory.GetFiles(dir).Sum(x => new FileInfo(x).Length);
     }
 
     public static void RunCommandSync(string command, string args = "", bool silent = false)
@@ -186,12 +190,14 @@ public class Util
         })?.WaitForExit();
     }
 
-    public static string GetCommandOutputSync(string command, string args = "", bool silent = true)
+    public static string GetCommandOutputSync(string command, string args = "", bool silent = true, bool stdout = true,
+        bool stderr = true)
     {
-        return GetCommandOutputInDirSync(Environment.CurrentDirectory, command, args, silent);
+        return GetCommandOutputInDirSync(Environment.CurrentDirectory, command, args, silent, stdout, stderr);
     }
 
-    public static string GetCommandOutputInDirSync(string path, string command, string args = "", bool silent = true)
+    public static string GetCommandOutputInDirSync(string path, string command, string args = "", bool silent = true,
+        bool stdout = true, bool stderr = true)
     {
         ProcessStartInfo psi = new ProcessStartInfo(command, args)
         {
@@ -207,12 +213,15 @@ public class Util
             if (!proc.StandardOutput.EndOfStream)
             {
                 string line = proc.StandardOutput.ReadLine() ?? "";
-                output += line + "\n";
+                if (stdout) output += line + "\n";
+                if (!silent) Console.WriteLine(output);
             }
+
             if (!proc.StandardError.EndOfStream)
             {
                 string line = proc.StandardError.ReadLine() ?? "";
-                output += line + "\n";
+                if (stderr) output += line + "\n";
+                if (!silent) Console.WriteLine(output);
             }
         }
 
@@ -221,7 +230,7 @@ public class Util
 
     public static String BytesToString(long byteCount, int maxnums = 2)
     {
-        string[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+        string[] suf = {"B", "KB", "MB", "GB", "TB", "PB", "EB"}; //Longs run out around EB
         if (byteCount == 0)
             return "0 " + suf[0];
         long bytes = Math.Abs(byteCount);
