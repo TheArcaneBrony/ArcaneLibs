@@ -1,8 +1,7 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
+using System.Text.Json;
+using ArcaneLibs.Extensions;
 
-namespace ArcaneLibs; 
+namespace ArcaneLibs;
 
 public class SaveableObject<T> where T : new() {
     public static T Read(string filename = "") {
@@ -12,7 +11,7 @@ public class SaveableObject<T> where T : new() {
         }
 
         return (File.Exists(filename)
-            ? JsonConvert.DeserializeObject<T>(File.ReadAllText(filename))
+            ? JsonSerializer.Deserialize<T>(File.ReadAllText(filename))
             : new T()) ?? new T();
     }
 
@@ -23,6 +22,6 @@ public class SaveableObject<T> where T : new() {
             filename = callerType.Name + ".json";
         }
 
-        File.WriteAllText(filename, JsonConvert.SerializeObject(this, Formatting.Indented));
+        File.WriteAllText(filename, this.ToJson());
     }
 }

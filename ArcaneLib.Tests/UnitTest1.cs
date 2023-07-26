@@ -1,5 +1,4 @@
 using ArcaneLibs;
-using Microsoft.VisualBasic.CompilerServices;
 using Xunit;
 
 namespace ArcaneLib.Tests;

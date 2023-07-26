@@ -1,5 +1,3 @@
-using System.Xml;
-
 namespace ArcaneLibs.Logging.LogEndpoints;
 
 public class FileEndpoint : BaseEndpoint
