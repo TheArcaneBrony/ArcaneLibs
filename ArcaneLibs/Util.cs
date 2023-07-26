@@ -41,7 +41,7 @@ public class Util
 
         DirectoryInfo[] dirs = dir.GetDirectories();
 
-        // If the destination directory doesn't exist, create it.       
+        // If the destination directory doesn't exist, create it.
         Directory.CreateDirectory(destDirName);
 
         // Get the files in the directory and copy them to the new location.
@@ -230,12 +230,23 @@ public class Util
 
     public static String BytesToString(long byteCount, int maxnums = 2)
     {
-        string[] suf = {"B", "KB", "MB", "GB", "TB", "PB", "EB"}; //Longs run out around EB
+        string[] suf = { "B", "kiB", "MiB", "GiB", "TiB", "PiB", "EiB" }; //Longs run out around EB
         if (byteCount == 0)
             return "0 " + suf[0];
         long bytes = Math.Abs(byteCount);
         int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
         double num = Math.Round(bytes / Math.Pow(1024, place), maxnums);
+        return (Math.Sign(byteCount) * num) + " " + suf[place];
+    }
+
+    public static String SI_BytesToString(long byteCount, int maxnums = 2)
+    {
+        string[] suf = { "B", "kB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+        if (byteCount == 0)
+            return "0 " + suf[0];
+        long bytes = Math.Abs(byteCount);
+        int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1000)));
+        double num = Math.Round(bytes / Math.Pow(1000, place), maxnums);
         return (Math.Sign(byteCount) * num) + " " + suf[place];
     }
 }
