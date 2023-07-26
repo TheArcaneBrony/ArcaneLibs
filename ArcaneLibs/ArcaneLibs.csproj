@@ -9,11 +9,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ArcaneLibs.Logging\ArcaneLibs.Logging.csproj" />
+        <ProjectReference Include="..\ArcaneLibs.Logging\ArcaneLibs.Logging.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Unidecode.NET" Version="2.1.0" />
+        <PackageReference Include="Unidecode.NET" Version="2.1.0"/>
     </ItemGroup>
 
 </Project>

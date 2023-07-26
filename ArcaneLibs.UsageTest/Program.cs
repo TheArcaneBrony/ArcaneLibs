@@ -9,9 +9,9 @@ using ArcaneLibs.UsageTest;
 
 Console.WriteLine("Hello, World!");
 //create logs
-LogManager log1 = new LogManager();
-LogManager log2 = new LogManager();
-LogManager log3 = new LogManager();
+var log1 = new LogManager();
+var log2 = new LogManager();
+var log3 = new LogManager();
 //add endpoints
 log1.AddEndpoint(new ConsoleEndpoint());
 log2.AddEndpoint(new DebugEndpoint());
@@ -24,14 +24,15 @@ log2.LogDebug("debug dbg log");
 log3.Log("file log");
 log3.LogDebug("file dbg log");
 
-for (int i = 0; i < 5; i++) {
-    Config myConfig = Config.Read();
+for (var i = 0; i < 5; i++) {
+    var myConfig = Config.Read();
     Console.WriteLine(myConfig.SomeNumber);
     myConfig.SomeNumber = i;
     myConfig.Save();
     myConfig = Config.Read();
     Console.WriteLine(myConfig.SomeNumber);
 }
+
 /*
 Console.Write("Expected: ");
 for (int i = 0; i < 5; i++)
@@ -44,7 +45,7 @@ for (int i = 0; i < 5; i++)
     Console.Write($"{MathUtil.Map(i, 0, 5, 25, 0)} ");
 }
 */
-var autodict = new AutoPopulatingDictionary<int, String>();
+var autodict = new AutoPopulatingDictionary<int, string>();
 var autodict2 = new AutoPopulatingDictionary<int, Config>();
 var autodict3 = new AutoPopulatingDictionary<int, Point>();
 
@@ -56,4 +57,3 @@ var c = autodict3[6];
 
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c asdf"));
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c ls"));
-

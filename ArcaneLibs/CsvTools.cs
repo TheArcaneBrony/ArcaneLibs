@@ -3,35 +3,30 @@ using System.Text;
 
 namespace ArcaneLibs;
 
-public class CsvTools
-{
-    public static string ToCsvHeader<T>(string separator)
-    {
-        Type t = typeof(T);
+public class CsvTools {
+    public static string ToCsvHeader<T>(string separator) {
+        var t = typeof(T);
         PropertyInfo[] fields = t.GetProperties();
-        string header = string.Join(separator, fields.Select(f => f.Name).ToArray());
+        var header = string.Join(separator, fields.Select(f => f.Name).ToArray());
         return header;
     }
 
-    public static string ToCsv<T>(string separator, IEnumerable<T> objectlist)
-    {
-        Type t = typeof(T);
+    public static string ToCsv<T>(string separator, IEnumerable<T> objectlist) {
+        var t = typeof(T);
         PropertyInfo[] fields = t.GetProperties();
-            
-        StringBuilder csvdata = new StringBuilder();
-            
-        foreach (var o in objectlist) 
+
+        var csvdata = new StringBuilder();
+
+        foreach (var o in objectlist)
             csvdata.AppendLine(ToCsvFields(separator, fields, o));
 
         return csvdata.ToString();
     }
 
-    public static string ToCsvFields(string separator, PropertyInfo[] fields, object o)
-    {
-        StringBuilder linie = new StringBuilder();
+    public static string ToCsvFields(string separator, PropertyInfo[] fields, object o) {
+        var linie = new StringBuilder();
 
-        foreach (var f in fields)
-        {
+        foreach (var f in fields) {
             if (linie.Length > 0)
                 linie.Append(separator);
 

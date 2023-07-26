@@ -3,11 +3,10 @@ using System.Text.Json;
 
 namespace ArcaneLibs.Extensions;
 
-public static class ObjectExtensions
-{
+public static class ObjectExtensions {
     public static void SaveToJsonFile(this object @object, string filename) // save object to json file
-    {
-        /*
+        =>
+            /*
         JsonSerializerSettings settings = new JsonSerializerSettings()
         {
             DefaultValueHandling = DefaultValueHandling.Populate,
@@ -24,11 +23,10 @@ public static class ObjectExtensions
         {
             // ignored
         }*/
+            Util.WriteAllTextIfDifferent(filename, ToJson(@object, true, false, false));
 
-        Util.WriteAllTextIfDifferent(filename, ToJson(@object, indent: true, ignoreNull: false, unsafeContent: false));
-    }
-
-    public static string ToJson(this object obj, bool indent = true, bool ignoreNull = false, bool unsafeContent = false) {
+    public static string ToJson(this object obj, bool indent = true, bool ignoreNull = false,
+        bool unsafeContent = false) {
         var jso = new JsonSerializerOptions();
         if (indent) jso.WriteIndented = true;
         if (ignoreNull) jso.IgnoreNullValues = true;

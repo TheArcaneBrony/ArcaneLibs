@@ -6,7 +6,7 @@ namespace ArcaneLibs;
 public class SaveableObject<T> where T : new() {
     public static T Read(string filename = "") {
         if (filename == "") {
-            Type callerType = typeof(T);
+            var callerType = typeof(T);
             filename = callerType.Name + ".json";
         }
 
@@ -15,10 +15,9 @@ public class SaveableObject<T> where T : new() {
             : new T()) ?? new T();
     }
 
-    public void Save(string filename = "")
-    {
+    public void Save(string filename = "") {
         if (filename == "") {
-            Type callerType = typeof(T);
+            var callerType = typeof(T);
             filename = callerType.Name + ".json";
         }
 

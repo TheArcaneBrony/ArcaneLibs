@@ -12,9 +12,7 @@ public static class DictionaryExtensions {
     }
 
     public static Y GetOrCreate<X, Y>(this IDictionary<X, Y> dict, X key) where Y : new() {
-        if (dict.TryGetValue(key, out var value)) {
-            return value;
-        }
+        if (dict.TryGetValue(key, out var value)) return value;
 
         value = new Y();
         dict.Add(key, value);
@@ -22,9 +20,7 @@ public static class DictionaryExtensions {
     }
 
     public static Y GetOrCreate<X, Y>(this IDictionary<X, Y> dict, X key, Func<X, Y> valueFactory) {
-        if (dict.TryGetValue(key, out var value)) {
-            return value;
-        }
+        if (dict.TryGetValue(key, out var value)) return value;
 
         value = valueFactory(key);
         dict.Add(key, value);

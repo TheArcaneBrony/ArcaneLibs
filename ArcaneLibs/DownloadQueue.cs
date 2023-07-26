@@ -12,31 +12,29 @@ public class DownloadQueue {
     public bool UpdatingQueue = true;
 
     public bool AllDownloadsFinished => !queue.Any(x => x.Progress < 1);
-    private int maxWidth => queue.Max(x=>x.FileName.Length);
+    private int maxWidth => queue.Max(x => x.FileName.Length);
     public Func<DownloadQueue, bool> ShouldQueueMore = (q) => q.running.Count >= q.MaxConcurrentDownloads;
-    
+
     public async Task Run() {
-        foreach (var n in queue.Where(x=>x.Size == 0)) {
-            File.Create(n.TargetFile).Close();
-        }
+        foreach (var n in queue.Where(x => x.Size == 0)) File.Create(n.TargetFile).Close();
 
         queue.RemoveAll(x => x.Size == 0);
         while (!AllDownloadsFinished || UpdatingQueue) {
-            while (!ShouldQueueMore(this)) {
+            while (!ShouldQueueMore(this))
                 // Console.Clear();
                 // Console.WriteLine(GetProgressBars());
                 await Task.Delay(10);
-            }
 
-            if (queue.Any(x => x.Progress == 0 && !x.Running)) queue.First(x => x.Progress == 0 && !x.Running).StartDownload();
+            if (queue.Any(x => x.Progress == 0 && !x.Running))
+                queue.First(x => x.Progress == 0 && !x.Running).StartDownload();
         }
     }
 
     public string GetProgressBars(int width = 100) {
-        int p = (int)(queue.Average(x => x.Progress)*width), np = width - p;
-        string header = $"{"Total".PadRight(maxWidth)} " +
-                        $"[{new string('=', Math.Max(p, 0))}>" +
-                        $"{new string(' ', Math.Max(np, 0))}]\n";
+        int p = (int)(queue.Average(x => x.Progress) * width), np = width - p;
+        var header = $"{"Total".PadRight(maxWidth)} " +
+                     $"[{new string('=', Math.Max(p, 0))}>" +
+                     $"{new string(' ', Math.Max(np, 0))}]\n";
         return header + string.Join("\n",
             running.Select(x => $"{x.FileName.PadRight(maxWidth)} " +
                                 $"[{new string('=', x.ProgressInt)}>" +
@@ -58,7 +56,7 @@ public class DownloadInfo {
 
     internal void StartDownload() {
         Running = true;
-        WebClient client = new WebClient();
+        var client = new WebClient();
         client.DownloadProgressChanged += (_, args) => BytesDownloaded = args.BytesReceived;
         client.DownloadFileCompleted += (_, _) => {
             BytesDownloaded = Size;
