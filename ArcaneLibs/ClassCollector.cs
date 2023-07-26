@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace MatrixRoomUtils.Core.Extensions;
+namespace ArcaneLibs;
 
 public class ClassCollector<T> where T : class {
     static ClassCollector() {

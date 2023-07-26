@@ -1,4 +1,7 @@
-namespace MatrixRoomUtils.Core.Extensions;
+using System.IO.Compression;
+using System.Text;
+
+namespace ArcaneLibs.Extensions;
 
 public static class DictionaryExtensions {
     public static bool ChangeKey<TKey, TValue>(this IDictionary<TKey, TValue> dict,
@@ -25,5 +28,44 @@ public static class DictionaryExtensions {
         value = valueFactory(key);
         dict.Add(key, value);
         return value;
+    }
+
+
+    public static bool StartsWith<T>(this IEnumerable<T> list, IEnumerable<T> prefix)
+    {
+        return prefix.SequenceEqual(list.Take(prefix.Count()));
+    }
+
+    public static void HexDump(this IEnumerable<byte> bytes, int width = 32)
+    {
+        var data = new Queue<(string hex, char utf8)>(bytes.ToArray().Select(x => ($"{x:X2}", (char)x)).ToArray());
+        while (data.Count > 0)
+        {
+            var line = data.Dequeue(Math.Min(width, data.Count)).ToArray();
+            Console.WriteLine(
+                string.Join(" ", line.Select(x => x.hex)).PadRight(width * 3)
+                + " | "
+                + string.Join("", line.Select(x => x.utf8))
+                    .Replace('\n', '.')
+                    .Replace('\r', '.')
+                    .Replace('\0', '.')
+            );
+        }
+    }
+
+    public static string AsHexString(this IEnumerable<byte> bytes) => string.Join(' ', bytes.Select(x => $"{x:X2}"));
+    public static string AsString(this IEnumerable<byte> bytes) => Encoding.UTF8.GetString(bytes.ToArray());
+
+
+    //zlib decompress
+    public static byte[] ZlibDecompress(this IEnumerable<byte> bytes)
+    {
+        var inStream = new MemoryStream(bytes.ToArray());
+        using ZLibStream stream = new ZLibStream(inStream, CompressionMode.Decompress);
+        using var result = new MemoryStream();
+        stream.CopyTo(result);
+        stream.Flush();
+        stream.Close();
+        return result.ToArray();
     }
 }
