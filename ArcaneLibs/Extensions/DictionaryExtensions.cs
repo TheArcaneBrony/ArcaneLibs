@@ -49,6 +49,8 @@ public static class DictionaryExtensions {
                     .Replace('\n', '.')
                     .Replace('\r', '.')
                     .Replace('\0', '.')
+                    .Replace('\t', '.')
+                    .Replace('\v', '.')
             );
         }
     }
