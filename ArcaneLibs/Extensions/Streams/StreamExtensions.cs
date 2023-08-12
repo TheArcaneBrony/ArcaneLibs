@@ -6,7 +6,7 @@ public static class StreamExtensions {
 	private const bool _debug = false;
 
 	public static long Remaining(this Stream stream) {
-		//if (_debug) Console.WriteLine($"stream pos: {stream.Position}, stream len: {stream.Length}, stream rem: {stream.Length - stream.Position}");
+		//if (_debug) if (_debug) Console.WriteLine($"stream pos: {stream.Position}, stream len: {stream.Length}, stream rem: {stream.Length - stream.Position}");
 		return stream.Length - stream.Position;
 	}
 
@@ -32,7 +32,7 @@ public static class StreamExtensions {
 		for (i = 0; i < count; i++) {
 			int peek = stream.ReadByte();
 			if (peek == -1) {
-				if (_debug) Console.WriteLine($"Can't peek {count} bytes, only {i} bytes remaining");
+				if (_debug) if (_debug) Console.WriteLine($"Can't peek {count} bytes, only {i} bytes remaining");
 				stream.Seek(-i, SeekOrigin.Current);
 				yield break;
 			}
@@ -62,8 +62,8 @@ public static class StreamExtensions {
 			throw new InvalidOperationException("Can't read a non-seekable stream");
 
 		if (_debug) {
-			Console.WriteLine($"Expected: {sequence.AsHexString()} ({sequence.AsString()})");
-			Console.WriteLine(
+			if (_debug) Console.WriteLine($"Expected: {sequence.AsHexString()} ({sequence.AsString()})");
+			if (_debug) Console.WriteLine(
 				$"Actual:   {stream.Peek(sequence.Count()).AsHexString()} ({stream.Peek(sequence.Count()).AsString()})");
 		}
 
@@ -78,9 +78,9 @@ public static class StreamExtensions {
 
 			if (read != b) {
 				if (_debug) {
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("^^".PadLeft(readCount * 3 + 9));
-					Console.ResetColor();
+					if (_debug) Console.ForegroundColor = ConsoleColor.Red;
+					if (_debug) Console.WriteLine("^^".PadLeft(readCount * 3 + 9));
+					if (_debug) Console.ResetColor();
 				}
 
 				stream.Seek(-readCount, SeekOrigin.Current);
@@ -130,10 +130,10 @@ public static class StreamExtensions {
 		var read = 0;
 		while (stream.Peek() != terminator) {
 			if (_debug)
-				Console.WriteLine(
+				if (_debug) Console.WriteLine(
 					$"ReadTerminatedField -- pos: {stream.Position}/+{stream.Remaining()}/{stream.Length} | next: {(char)stream.Peek()} | Length: {read}");
 			if (stream.Peek() == -1) {
-				Console.WriteLine($"Warning: Reached end of stream while reading null-terminated field");
+				if (_debug) Console.WriteLine($"Warning: Reached end of stream while reading null-terminated field");
 				yield break;
 			}
 
@@ -163,10 +163,10 @@ public static class StreamExtensions {
 		int b;
 		while ((b = stream.ReadByte()) != terminator) {
 			if (_debug)
-				Console.WriteLine(
+				if (_debug) Console.WriteLine(
 					$"ReadTerminatedField -- pos: {stream.Position}/+{stream.Remaining()}/{stream.Length} | next: {(char)stream.Peek()} | Length: {read}");
 			if (b == -1) {
-				Console.WriteLine($"Warning: Reached end of stream while reading null-terminated field");
+				if (_debug) Console.WriteLine($"Warning: Reached end of stream while reading null-terminated field");
 				yield break;
 			}
 
@@ -199,7 +199,7 @@ public static class StreamExtensions {
 		if (!BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadInt16LE: " + bytes.AsHexString() + " => " + BitConverter.ToInt16(bytes));
+		// if (_debug) Console.WriteLine("ReadInt16LE: " + bytes.AsHexString() + " => " + BitConverter.ToInt16(bytes));
 		return BitConverter.ToInt16(bytes);
 	}
 
@@ -212,7 +212,7 @@ public static class StreamExtensions {
 		if (BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadInt16BE: " + bytes.AsHexString() + " => " + BitConverter.ToInt16(bytes));
+		// if (_debug) Console.WriteLine("ReadInt16BE: " + bytes.AsHexString() + " => " + BitConverter.ToInt16(bytes));
 		return BitConverter.ToInt16(bytes);
 	}
 
@@ -229,7 +229,7 @@ public static class StreamExtensions {
 		if (!BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadUInt16LE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt16(bytes));
+		// if (_debug) Console.WriteLine("ReadUInt16LE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt16(bytes));
 		return BitConverter.ToUInt16(bytes);
 	}
 
@@ -242,7 +242,7 @@ public static class StreamExtensions {
 		if (BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadUInt16BE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt16(bytes));
+		if (_debug) Console.WriteLine("ReadUInt16BE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt16(bytes));
 		return BitConverter.ToUInt16(bytes);
 	}
 
@@ -259,7 +259,7 @@ public static class StreamExtensions {
 		if (!BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadInt32LE: " + bytes.AsHexString() + " => " + BitConverter.ToInt32(bytes));
+		if (_debug) Console.WriteLine("ReadInt32LE: " + bytes.AsHexString() + " => " + BitConverter.ToInt32(bytes));
 		return BitConverter.ToInt32(bytes);
 	}
 
@@ -272,7 +272,7 @@ public static class StreamExtensions {
 		if (BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadInt32BE: " + bytes.AsHexString() + " => " + BitConverter.ToInt32(bytes));
+		if (_debug) Console.WriteLine("ReadInt32BE: " + bytes.AsHexString() + " => " + BitConverter.ToInt32(bytes));
 		return BitConverter.ToInt32(bytes);
 	}
 
@@ -289,7 +289,7 @@ public static class StreamExtensions {
 		if (BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadUInt32BE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt32(bytes));
+		if (_debug) Console.WriteLine("ReadUInt32BE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt32(bytes));
 		return BitConverter.ToUInt32(bytes);
 	}
 
@@ -302,7 +302,7 @@ public static class StreamExtensions {
 		if (!BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadUInt32LE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt32(bytes));
+		if (_debug) Console.WriteLine("ReadUInt32LE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt32(bytes));
 		return BitConverter.ToUInt32(bytes);
 	}
 
@@ -319,7 +319,7 @@ public static class StreamExtensions {
 		if (!BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadInt64LE: " + bytes.AsHexString() + " => " + BitConverter.ToInt64(bytes));
+		if (_debug) Console.WriteLine("ReadInt64LE: " + bytes.AsHexString() + " => " + BitConverter.ToInt64(bytes));
 		return BitConverter.ToInt64(bytes);
 	}
 
@@ -332,7 +332,7 @@ public static class StreamExtensions {
 		if (BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadInt64BE: " + bytes.AsHexString() + " => " + BitConverter.ToInt64(bytes));
+		if (_debug) Console.WriteLine("ReadInt64BE: " + bytes.AsHexString() + " => " + BitConverter.ToInt64(bytes));
 		return BitConverter.ToInt64(bytes);
 	}
 
@@ -349,7 +349,7 @@ public static class StreamExtensions {
 		if (!BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadUInt64LE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt64(bytes));
+		if (_debug) Console.WriteLine("ReadUInt64LE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt64(bytes));
 		return BitConverter.ToUInt64(bytes);
 	}
 
@@ -362,7 +362,7 @@ public static class StreamExtensions {
 		if (BitConverter.IsLittleEndian)
 			Array.Reverse(bytes);
 
-		Console.WriteLine("ReadUInt64BE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt64(bytes));
+		if (_debug) Console.WriteLine("ReadUInt64BE: " + bytes.AsHexString() + " => " + BitConverter.ToUInt64(bytes));
 		return BitConverter.ToUInt64(bytes);
 	}
 
