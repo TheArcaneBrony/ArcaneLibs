@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace ArcaneLibs.Extensions;
+namespace ArcaneLibs.Extensions.Streams;
 
 public static class StreamExtensions {
 	private const bool _debug = false;

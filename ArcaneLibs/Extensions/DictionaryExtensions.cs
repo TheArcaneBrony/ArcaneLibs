@@ -26,6 +26,14 @@ public static class DictionaryExtensions {
         if (dict.TryGetValue(key, out var value)) return value;
 
         value = valueFactory(key);
+        lock(dict)
+            dict.TryAdd(key, value);
+        return value;
+    }
+    public static async Task<Y> GetOrCreateAsync<X, Y>(this IDictionary<X, Y> dict, X key, Func<X, Task<Y>> valueFactory) {
+        if (dict.TryGetValue(key, out var value)) return value;
+
+        value = await valueFactory(key);
         dict.Add(key, value);
         return value;
     }
