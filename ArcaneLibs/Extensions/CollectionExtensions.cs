@@ -12,4 +12,14 @@ public static class CollectionExtensions {
         array[^1] = item;
         return array;
     }
+
+    //return task results async without preserving order
+    public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IEnumerable<Task<T>> tasks) {
+        var taskList = tasks.ToList();
+        while (taskList.Count > 0) {
+            var task = await Task.WhenAny(taskList);
+            taskList.Remove(task);
+            yield return await task;
+        }
+    }
 }
