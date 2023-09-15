@@ -4,9 +4,9 @@ namespace ArcaneLibs;
 
 public class ClassCollector<T> where T : class {
     static ClassCollector() {
-        if (!typeof(T).IsInterface)
+        if (!typeof(T).IsInterface && !typeof(T).IsAbstract)
             throw new ArgumentException(
-                $"ClassCollector<T> must be used with an interface type. Passed type: {typeof(T).Name}");
+                $"ClassCollector<T> must be used with an interface or abstract type. Passed type: {typeof(T).Name}");
     }
 
     public List<Type> ResolveFromAllAccessibleAssemblies() =>

@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Net;
 
 namespace ArcaneLibs;
 
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class Util {
     public static ulong ParseTime(string time) {
         var timestring = time[0..^1];
@@ -61,9 +63,7 @@ public class Util {
         else if (File.Exists(filename)) File.Delete(filename);
 
         if (printProgress)
-            wc.DownloadProgressChanged += (_, args) => {
-                Console.Write($"Downloading {contextName}... {args.ProgressPercentage}%\r");
-            };
+            wc.DownloadProgressChanged += (_, args) => { Console.Write($"Downloading {contextName}... {args.ProgressPercentage}%\r"); };
         wc.DownloadFileCompleted += (_, _) => {
             //Console.WriteLine(printProgress?"\n":"" + $"Finished downloading {contextName}");
         };
@@ -134,7 +134,7 @@ public class Util {
         RunCommandInDirSync(Environment.CurrentDirectory, command, args, silent);
 
     public static void RunCommandInDirSync(string path, string command, string args = "", bool silent = false) =>
-        Process.Start(new ProcessStartInfo() {
+        Process.Start(new ProcessStartInfo {
             WorkingDirectory = path,
             FileName = command,
             Arguments = args,
@@ -170,6 +170,35 @@ public class Util {
         }
 
         return output.TrimEnd('\n');
+    }
+
+    public static IAsyncEnumerable<string> GetCommandOutputAsync(string command, string args = "", bool silent = true, bool stdout = true,
+        bool stderr = true) =>
+        GetCommandOutputInDirAsync(Environment.CurrentDirectory, command, args, silent, stdout, stderr);
+
+    public static async IAsyncEnumerable<string> GetCommandOutputInDirAsync(string path, string command, string args = "", bool silent = true,
+        bool stdout = true, bool stderr = true) {
+        var psi = new ProcessStartInfo(command, args) {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            WorkingDirectory = path
+        };
+        var proc = Process.Start(psi);
+        var output = "";
+        while (!proc!.StandardOutput.EndOfStream || !proc.StandardError.EndOfStream || !proc.HasExited) {
+            if (!proc.StandardOutput.EndOfStream) {
+                var line = await proc.StandardOutput.ReadLineAsync() ?? "";
+                if (stdout) yield return line;
+                if (!silent) Console.WriteLine(output);
+            }
+
+            if (!proc.StandardError.EndOfStream) {
+                var line = await proc.StandardError.ReadLineAsync() ?? "";
+                if (stderr) yield return line;
+                if (!silent) Console.WriteLine(output);
+            }
+        }
     }
 
     public static string BytesToString(long byteCount, int maxnums = 2) {
