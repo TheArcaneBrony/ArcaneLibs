@@ -31,6 +31,6 @@ public static class ObjectExtensions {
         if (indent) jso.WriteIndented = true;
         if (ignoreNull) jso.IgnoreNullValues = true;
         if (unsafeContent) jso.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-        return JsonSerializer.Serialize(obj, jso);
+        return JsonSerializer.Serialize(obj, obj.GetType(), jso);
     }
 }

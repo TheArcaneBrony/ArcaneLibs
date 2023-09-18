@@ -22,5 +22,5 @@ public class ClassCollector<T> where T : class {
         ResolveFromAssembly(Assembly.Load(assemblyName));
 
     public List<Type> ResolveFromAssembly(Assembly assembly) => assembly.GetTypes()
-        .Where(x => x is { IsClass: true, IsAbstract: false } && x.GetInterfaces().Contains(typeof(T))).ToList();
+        .Where(x => x is { IsClass: true, IsAbstract: false } && x.IsAssignableTo(typeof(T))).ToList();
 }
