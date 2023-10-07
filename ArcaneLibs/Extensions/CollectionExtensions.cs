@@ -22,4 +22,14 @@ public static class CollectionExtensions {
             yield return await task;
         }
     }
+
+    //return task results async without preserving order
+    public static async IAsyncEnumerable<(Task task, T result)> ToAsyncEnumerableWithContext<T>(this IEnumerable<Task<T>> tasks) {
+        var taskList = tasks.ToList();
+        while (taskList.Count > 0) {
+            var task = await Task.WhenAny(taskList);
+            taskList.Remove(task);
+            yield return (task, await task);
+        }
+    }
 }
