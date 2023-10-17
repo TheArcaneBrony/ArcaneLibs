@@ -1,0 +1,15 @@
+@using System.Threading.Tasks
+
+<img src="@ImageUrl" />
+
+@code {
+    [Parameter]
+    public Task<string> ImageUrlTask { get; set; }
+
+    private string ImageUrl { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ImageUrl = await ImageUrlTask;
+    }
+}

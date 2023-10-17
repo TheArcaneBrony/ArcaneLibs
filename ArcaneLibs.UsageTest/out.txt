@@ -1,0 +1,2 @@
+Program.cs:25 file log
+Program.cs:26 file dbg log

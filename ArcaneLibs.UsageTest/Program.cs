@@ -6,6 +6,7 @@ using ArcaneLibs.Collections;
 using ArcaneLibs.Logging;
 using ArcaneLibs.Logging.LogEndpoints;
 using ArcaneLibs.UsageTest;
+using ArcaneLibs.Extensions;
 
 Console.WriteLine("Hello, World!");
 //create logs
@@ -57,3 +58,24 @@ var c = autodict3[6];
 
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c asdf"));
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c ls"));
+
+RandomClass arc = new RandomClass(){
+    Id = 1,
+    Name = "asdf",
+    DateCreated = DateTime.Now,
+    SubClassInst = new(){
+        Description = "asdf"
+    }
+};
+RandomClass brc = new RandomClass(){
+    Id = 2,
+    Name = "asdf",
+    DateCreated = DateTime.Now,
+    SubClassInst = new(){
+        Description = "asdf"
+    }
+};
+
+var differences = arc.FindDifferencesDeep(brc);
+Console.WriteLine(differences.left.ToJson());
+Console.WriteLine(differences.right.ToJson());
