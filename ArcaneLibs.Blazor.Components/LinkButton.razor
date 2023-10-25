@@ -1,5 +1,5 @@
-<a href="@href" class="btn btn-primary" @onclick="@(() => OnClick?.Invoke())"
-   style="background-color: @(Color ?? "#1b6ec2");">
+<a href="@href" class="btn btn-primary" @onclick="Callback"
+   style="background-color: @(Color ?? "#1b6ec2"); @(Round ? "border-radius: 25px;" : "")">
     @ChildContent
 </a>
 
@@ -16,5 +16,13 @@
 
     [Parameter]
     public Func<Task>? OnClick { get; set; }
+    
+    [Parameter]
+    public bool Round { get; set; }
+
+    private void Callback() {
+        if (OnClick is not null)
+            OnClick();
+    }
 
 }

@@ -1,5 +1,5 @@
 .r-modal {
-    position: absolute;
+    position: fixed;
     width: fit-content;
     height: fit-content;
     z-index: 1000;
