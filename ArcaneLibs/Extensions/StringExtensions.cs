@@ -36,9 +36,7 @@ public static class StringExtensions {
         return false;
     }
 
-    public static bool
-        StartsWithAnyOf(this string str,
-            IEnumerable<string> test) //check if string starts with any lowercase instance of any item
+    public static bool StartsWithAnyOf(this string str, IEnumerable<string> test) //check if string starts with any lowercase instance of any item
     {
         foreach (var item in test)
             if (str.ToLower().StartsWith(item.ToLower()))
@@ -46,6 +44,8 @@ public static class StringExtensions {
 
         return false;
     }
+
+    public static bool StartsWithAnyOf(this string str, params string[] test) => StartsWithAnyOf(str, test.ToList());
 
     public static string ContentOrEmtpy(this string str) //check empty string if null
     {
@@ -96,11 +96,11 @@ public static class StringExtensions {
                 ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries) // Split the item
                 : new[] { element }) // Keep the entire item
             .SelectMany(element => element).ToArray();
+
     public static IEnumerable<byte> AsBytes(this string str) => Encoding.UTF8.GetBytes(str);
 
     public static string RemoveAnsi(this string str) {
         var ansiRegex = new Regex(@"\x1B\[[0-?]*[ -/]*[@-~]");
         return ansiRegex.Replace(str, "");
     }
-
 }
