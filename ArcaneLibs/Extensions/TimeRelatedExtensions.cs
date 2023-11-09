@@ -21,4 +21,10 @@ public static class TimeRelatedExtensions {
         sw.Stop();
         return Math.Round(sw.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond, 2);
     }
+
+    public static TimeSpan GetElapsedAndRestart(this Stopwatch sw) {
+        var elapsed = sw.Elapsed;
+        sw.Restart();
+        return elapsed;
+    }
 }

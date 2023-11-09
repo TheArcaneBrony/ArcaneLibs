@@ -33,13 +33,17 @@ public static class DictionaryExtensions {
 
     public static async Task<Y> GetOrCreateAsync<X, Y>(this IDictionary<X, Y> dict, X key, Func<X, Task<Y>> valueFactory, SemaphoreSlim? semaphore = null) {
         if (semaphore is not null) await semaphore.WaitAsync();
-        if (dict.TryGetValue(key, out var value)) {
-            if (semaphore is not null) semaphore.Release();
-            return value;
-        }
+        Y value;
+        // lock (dict) {
+            if (dict.TryGetValue(key, out value)) {
+                if (semaphore is not null) semaphore.Release();
+                return value;
+            }
 
-        value = await valueFactory(key);
-        dict.Add(key, value);
+            value = await valueFactory(key);
+            dict.TryAdd(key, value);
+        // }
+
         if (semaphore is not null) semaphore.Release();
         return value;
     }
@@ -80,5 +84,9 @@ public static class DictionaryExtensions {
         stream.Flush();
         stream.Close();
         return result.ToArray();
+    }
+
+    public static T GetByCaseInsensitiveKey<T>(this IDictionary<string, T> dict, string key) {
+        return dict.First(x => x.Key.ToLower() == key.ToLower()).Value;
     }
 }
