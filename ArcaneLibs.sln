@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.UsageTest", "Arc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.StringNormalisation", "ArcaneLibs.StringNormalisation\ArcaneLibs.StringNormalisation.csproj", "{91694CDF-6F5A-4637-9466-A864A93944A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.Blazor.Components", "ArcaneLibs.Blazor.Components\ArcaneLibs.Blazor.Components.csproj", "{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{91694CDF-6F5A-4637-9466-A864A93944A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91694CDF-6F5A-4637-9466-A864A93944A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91694CDF-6F5A-4637-9466-A864A93944A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
