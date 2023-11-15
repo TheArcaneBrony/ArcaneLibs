@@ -6,7 +6,7 @@ namespace ArcaneLibs;
 public class Timing {
     public bool PrintTimings;
 
-    public Stopwatch StartTiming(string name) {
+    public Stopwatch StartTiming(string name, int timeoutMs = 60000) {
         var sw = Timings.GetOrAdd(name, (_) => {
             var lsw = new Stopwatch();
             lsw.Start();
@@ -19,9 +19,9 @@ public class Timing {
         new Thread(() => {
             if (Timings.TryGetValue(name, out var timing))
                 while (timing.IsRunning) {
-                    if (timing.ElapsedMilliseconds >= 60000) Fail(name);
+                    if (timing.ElapsedMilliseconds >= timeoutMs) Fail(name);
 
-                    Thread.Sleep(1);
+                    Thread.Sleep(250);
                 }
             else
                 Console.WriteLine("Could not find timing with name " + name);

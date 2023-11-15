@@ -1,7 +1,5 @@
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Unidecode.NET;
 
 namespace ArcaneLibs.Extensions;
 
@@ -64,20 +62,6 @@ public static class StringExtensions {
         return instances;
     }
 
-    public static string RemoveDiacritics(this string text) {
-        var normalizedString = text.Normalize(NormalizationForm.FormD);
-        var stringBuilder = new StringBuilder();
-
-        foreach (var c in normalizedString) {
-            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-            if (unicodeCategory != UnicodeCategory.NonSpacingMark) stringBuilder.Append(c);
-        }
-
-        return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
-    }
-
-    public static string ToAlphaNumeric(this string text) => text.Unidecode();
-
     public static void WriteAllTextFailSafe(this string text, string path, int maxAttempts = 10) {
         var success = false;
         while (maxAttempts-- > 0)
@@ -98,9 +82,5 @@ public static class StringExtensions {
             .SelectMany(element => element).ToArray();
 
     public static IEnumerable<byte> AsBytes(this string str) => Encoding.UTF8.GetBytes(str);
-
-    public static string RemoveAnsi(this string str) {
-        var ansiRegex = new Regex(@"\x1B\[[0-?]*[ -/]*[@-~]");
-        return ansiRegex.Replace(str, "");
-    }
+    
 }
