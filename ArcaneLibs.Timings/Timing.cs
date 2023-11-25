@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace ArcaneLibs;
@@ -19,8 +19,8 @@ public class Timing {
         new Thread(() => {
             if (Timings.TryGetValue(name, out var timing))
                 while (timing.IsRunning) {
-                    if (timing.ElapsedMilliseconds >= timeoutMs) Fail(name);
-
+                    if (timing.ElapsedMilliseconds >= timeoutMs)
+                        Fail(name);
                     Thread.Sleep(250);
                 }
             else

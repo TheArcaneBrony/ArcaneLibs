@@ -24,18 +24,18 @@ public class CsvTools {
     }
 
     public static string ToCsvFields(string separator, PropertyInfo[] fields, object o) {
-        var linie = new StringBuilder();
+        var line = new StringBuilder();
 
         foreach (var f in fields) {
-            if (linie.Length > 0)
-                linie.Append(separator);
+            if (line.Length > 0)
+                line.Append(separator);
 
             var x = f.GetValue(o);
 
             if (x != null)
-                linie.Append(x.ToString());
+                line.Append(x.ToString());
         }
 
-        return linie.ToString();
+        return line.ToString();
     }
 }

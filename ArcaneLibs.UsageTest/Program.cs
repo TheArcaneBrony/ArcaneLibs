@@ -1,12 +1,12 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 
 using System.Drawing;
 using ArcaneLibs;
 using ArcaneLibs.Collections;
+using ArcaneLibs.Extensions;
 using ArcaneLibs.Logging;
 using ArcaneLibs.Logging.LogEndpoints;
 using ArcaneLibs.UsageTest;
-using ArcaneLibs.Extensions;
 
 Console.WriteLine("Hello, World!");
 //create logs
@@ -25,15 +25,6 @@ log2.LogDebug("debug dbg log");
 log3.Log("file log");
 log3.LogDebug("file dbg log");
 
-for (var i = 0; i < 5; i++) {
-    var myConfig = Config.Read();
-    Console.WriteLine(myConfig.SomeNumber);
-    myConfig.SomeNumber = i;
-    myConfig.Save();
-    myConfig = Config.Read();
-    Console.WriteLine(myConfig.SomeNumber);
-}
-
 /*
 Console.Write("Expected: ");
 for (int i = 0; i < 5; i++)
@@ -47,11 +38,9 @@ for (int i = 0; i < 5; i++)
 }
 */
 var autodict = new AutoPopulatingDictionary<int, string>();
-var autodict2 = new AutoPopulatingDictionary<int, Config>();
 var autodict3 = new AutoPopulatingDictionary<int, Point>();
 
 var a = autodict[3];
-var b = autodict2[5];
 var c = autodict3[6];
 
 //return;
@@ -59,19 +48,19 @@ var c = autodict3[6];
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c asdf"));
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c ls"));
 
-RandomClass arc = new RandomClass(){
+RandomClass arc = new RandomClass() {
     Id = 1,
     Name = "asdf",
     DateCreated = DateTime.Now,
-    SubClassInst = new(){
+    SubClassInst = new() {
         Description = "asdf"
     }
 };
-RandomClass brc = new RandomClass(){
+RandomClass brc = new RandomClass() {
     Id = 2,
     Name = "asdf",
     DateCreated = DateTime.Now,
-    SubClassInst = new(){
+    SubClassInst = new() {
         Description = "asdf"
     }
 };

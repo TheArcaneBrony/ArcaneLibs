@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.StringNormalisat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.Blazor.Components", "ArcaneLibs.Blazor.Components\ArcaneLibs.Blazor.Components.csproj", "{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.Timings", "ArcaneLibs.Timings\ArcaneLibs.Timings.csproj", "{01E2960C-1482-445B-A37D-C182A6DB3C34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.Legacy", "ArcaneLibs.Legacy\ArcaneLibs.Legacy.csproj", "{9A77704F-5099-401E-99ED-5B756214461B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +46,13 @@ Global
 		{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CB4C1FB-B63C-4ED4-B3D2-716E4140CF32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01E2960C-1482-445B-A37D-C182A6DB3C34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01E2960C-1482-445B-A37D-C182A6DB3C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01E2960C-1482-445B-A37D-C182A6DB3C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01E2960C-1482-445B-A37D-C182A6DB3C34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A77704F-5099-401E-99ED-5B756214461B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A77704F-5099-401E-99ED-5B756214461B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A77704F-5099-401E-99ED-5B756214461B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A77704F-5099-401E-99ED-5B756214461B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

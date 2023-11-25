@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ArcaneLibs; 
+namespace ArcaneLibs;
 
 public class NotifyPropertyChanged : INotifyPropertyChanged {
     public event PropertyChangedEventHandler? PropertyChanged;

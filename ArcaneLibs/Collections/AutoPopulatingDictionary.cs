@@ -9,16 +9,12 @@ public class AutoPopulatingDictionary<T1, T2> : Dictionary<T1, T2> {
     public T2 this[T1 key] {
         get {
             var a = typeof(T2).GetConstructors();
-            if (!_backingStore.ContainsKey(key)) _backingStore.Add(key, GetNewInstance.Invoke());
             return _backingStore[key];
         }
-        set {
-            if (!_backingStore.ContainsKey(key)) _backingStore.Add(key, value);
-            else _backingStore[key] = value;
-        }
+        set => _backingStore[key] = value;
     }
-
-    private Func<T2> GetNewInstance = () => {
+    
+    public Func<T1, T2> GetNewInstance = (T1 key) => {
         if (typeof(T2) == typeof(string)) return (T2)(object)"";
         return Activator.CreateInstance<T2>();
     };

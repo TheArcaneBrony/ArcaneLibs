@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Net;
@@ -29,9 +29,7 @@ public class Util {
         var dir = new DirectoryInfo(sourceDirName);
 
         if (!dir.Exists)
-            throw new DirectoryNotFoundException(
-                "Source directory does not exist or could not be found: "
-                + sourceDirName);
+            throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourceDirName}");
 
         DirectoryInfo[] dirs = dir.GetDirectories();
 
@@ -53,14 +51,13 @@ public class Util {
             }
     }
 
-    public static void DownloadFile(string contextName, string url, string filename, bool overwrite = false,
-        bool extract = false, bool printProgress = true) {
-        var wc = new WebClient();
+    public static void DownloadFile(string contextName, string url, string filename, bool overwrite = false, bool extract = false, bool printProgress = true) {
+        using var wc = new WebClient();
         if (File.Exists(filename) && !overwrite) {
             Console.WriteLine($"Not downloading {filename}, file exists.");
             return;
         }
-        else if (File.Exists(filename)) File.Delete(filename);
+        if (File.Exists(filename)) File.Delete(filename);
 
         if (printProgress)
             wc.DownloadProgressChanged += (_, args) => { Console.Write($"Downloading {contextName}... {args.ProgressPercentage}%\r"); };
@@ -86,44 +83,6 @@ public class Util {
 
     public static double Max(params double[] numbers) => numbers.Max();
 
-    public static Dictionary<string, int> GetGitCommitCounts() {
-        Dictionary<string, int> commitCounts = new();
-        var psi = new ProcessStartInfo("git", "shortlog -s -n --all") {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        var proc = Process.Start(psi);
-        while (!proc.StandardOutput.EndOfStream) {
-            var line = proc.StandardOutput.ReadLine() ?? "";
-            if (line.Length > 4) {
-                string[] commits = line.Trim().Split("\t");
-                if (commitCounts.ContainsKey(commits[1] ?? "Unknown"))
-                    commitCounts[commits?[1] ?? "Unknown"] += int.Parse(commits?[0] ?? "-1");
-                else commitCounts.Add(commits?[1] ?? "Unknown", int.Parse(commits?[0] ?? "-1"));
-            }
-        }
-
-        return commitCounts;
-    }
-
-    /// <summary>
-    /// Writes file if different.
-    /// </summary>
-    /// <param name="path">File path</param>
-    /// <param name="text">Text to write</param>
-    /// <returns>Wether the file was changed</returns>
-    public static bool WriteAllTextIfDifferent(string path, string text) {
-        var content = "";
-        if (File.Exists(path)) content = File.ReadAllText(path);
-
-        if (content != text) {
-            File.WriteAllText(path, text);
-            return true;
-        }
-
-        return false;
-    }
-
     public static long GetDirSizeRecursive(string dir) {
         if (!Directory.Exists(dir)) return 0;
         return Directory.GetDirectories(dir).Sum(GetDirSizeRecursive) +
@@ -141,12 +100,10 @@ public class Util {
             RedirectStandardOutput = !silent
         })?.WaitForExit();
 
-    public static string GetCommandOutputSync(string command, string args = "", bool silent = true, bool stdout = true,
-        bool stderr = true) =>
+    public static string GetCommandOutputSync(string command, string args = "", bool silent = true, bool stdout = true, bool stderr = true) =>
         GetCommandOutputInDirSync(Environment.CurrentDirectory, command, args, silent, stdout, stderr);
 
-    public static string GetCommandOutputInDirSync(string path, string command, string args = "", bool silent = true,
-        bool stdout = true, bool stderr = true) {
+    public static string GetCommandOutputInDirSync(string path, string command, string args = "", bool silent = true, bool stdout = true, bool stderr = true) {
         var psi = new ProcessStartInfo(command, args) {
             CreateNoWindow = true,
             RedirectStandardOutput = true,

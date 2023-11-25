@@ -30,6 +30,8 @@ jobs:
           rm -rf *.nupkg
           dotnet pack --nologo --version-suffix preview$GITHUB_RUN_ID.$(git rev-parse --short HEAD) -o . ArcaneLibs
           dotnet pack --nologo --version-suffix preview$GITHUB_RUN_ID.$(git rev-parse --short HEAD) -o . ArcaneLibs.Logging
+          dotnet pack --nologo --version-suffix preview$GITHUB_RUN_ID.$(git rev-parse --short HEAD) -o . ArcaneLibs.Timings
+          dotnet pack --nologo --version-suffix preview$GITHUB_RUN_ID.$(git rev-parse --short HEAD) -o . ArcaneLibs.Legacy
           dotnet pack --nologo --version-suffix preview$GITHUB_RUN_ID.$(git rev-parse --short HEAD) -o . ArcaneLibs.StringNormalisation
           dotnet pack --nologo --version-suffix preview$GITHUB_RUN_ID.$(git rev-parse --short HEAD) -o . ArcaneLibs.Blazor.Components
           dotnet nuget push $(ls *.nupkg) -k ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

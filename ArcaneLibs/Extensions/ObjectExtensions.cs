@@ -24,7 +24,7 @@ public static class ObjectExtensions {
         {
             // ignored
         }*/
-            Util.WriteAllTextIfDifferent(filename, ToJson(@object, true, false, false));
+            File.WriteAllText(filename, ToJson(@object, true, false, false));
 
     public static string ToJson(this object obj, bool indent = true, bool ignoreNull = false,
         bool unsafeContent = false) {
@@ -60,10 +60,10 @@ public static class ObjectExtensions {
                 field.SetValue(instance, DeepClone(fieldValue));
             }
 
-            return (T) instance;
+            return (T)instance;
         }
 
-        throw new ArgumentException("Unknown type");       
+        throw new ArgumentException("Unknown type");
     }
 
     public static (T left, T right) FindDifferencesDeep<T>(this T left, T right) where T : class {
@@ -82,8 +82,8 @@ public static class ObjectExtensions {
                 copiedRight.SetValue(tuple.right, i);
             }
 
-            return ((T) Convert.ChangeType(copiedLeft, left.GetType()),
-                (T) Convert.ChangeType(copiedRight, right.GetType()));
+            return ((T)Convert.ChangeType(copiedLeft, left.GetType()),
+                (T)Convert.ChangeType(copiedRight, right.GetType()));
         }
 
         if (type.IsClass) {
@@ -101,7 +101,7 @@ public static class ObjectExtensions {
                 field.SetValue(instanceRight, fieldValueRight);
             }
 
-            return ((T) instanceLeft, (T) instanceRight);
+            return ((T)instanceLeft, (T)instanceRight);
         }
 
         throw new ArgumentException("Unknown type");

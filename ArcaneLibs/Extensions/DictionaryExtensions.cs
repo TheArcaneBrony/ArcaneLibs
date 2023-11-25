@@ -35,13 +35,13 @@ public static class DictionaryExtensions {
         if (semaphore is not null) await semaphore.WaitAsync();
         Y value;
         // lock (dict) {
-            if (dict.TryGetValue(key, out value)) {
-                if (semaphore is not null) semaphore.Release();
-                return value;
-            }
+        if (dict.TryGetValue(key, out value)) {
+            if (semaphore is not null) semaphore.Release();
+            return value;
+        }
 
-            value = await valueFactory(key);
-            dict.TryAdd(key, value);
+        value = await valueFactory(key);
+        dict.TryAdd(key, value);
         // }
 
         if (semaphore is not null) semaphore.Release();

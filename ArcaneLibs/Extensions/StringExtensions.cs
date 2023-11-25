@@ -82,5 +82,5 @@ public static class StringExtensions {
             .SelectMany(element => element).ToArray();
 
     public static IEnumerable<byte> AsBytes(this string str) => Encoding.UTF8.GetBytes(str);
-    
+
 }
