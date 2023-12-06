@@ -8,4 +8,15 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <Optimize>true</Optimize>
+        <RunAOTCompilation>true</RunAOTCompilation>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishSingleFile>true</PublishSingleFile>
+        <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
+        <PublishTrimmedShowLinkerSizeComparison>true</PublishTrimmedShowLinkerSizeComparison>
+        <PublishTrimmedShowLinkerSizeComparisonWarnings>true</PublishTrimmedShowLinkerSizeComparisonWarnings>
+    </PropertyGroup>
+
 </Project>

@@ -6,10 +6,10 @@ using System.Net;
 namespace ArcaneLibs;
 
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-public class Util {
+public static class Util {
     public static ulong ParseTime(string time) {
-        var timestring = time[0..^1];
-        if (ulong.TryParse(timestring, out var seconds))
+        var timeString = time[..^1];
+        if (ulong.TryParse(timeString, out var seconds))
             return time.Last() switch {
                 's' => seconds,
                 'm' => seconds * 60,
@@ -31,13 +31,13 @@ public class Util {
         if (!dir.Exists)
             throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourceDirName}");
 
-        DirectoryInfo[] dirs = dir.GetDirectories();
+        var dirs = dir.GetDirectories();
 
         // If the destination directory doesn't exist, create it.
         Directory.CreateDirectory(destDirName);
 
         // Get the files in the directory and copy them to the new location.
-        FileInfo[] files = dir.GetFiles();
+        var files = dir.GetFiles();
         foreach (var file in files) {
             var temppath = Path.Combine(destDirName, file.Name);
             file.CopyTo(temppath, false);
@@ -57,6 +57,7 @@ public class Util {
             Console.WriteLine($"Not downloading {filename}, file exists.");
             return;
         }
+
         if (File.Exists(filename)) File.Delete(filename);
 
         if (printProgress)
@@ -111,6 +112,7 @@ public class Util {
             WorkingDirectory = path
         };
         var proc = Process.Start(psi);
+        if (proc is null) throw new NullReferenceException("Process was null!");
         var output = "";
         while (!proc.StandardOutput.EndOfStream || !proc.StandardError.EndOfStream) {
             if (!proc.StandardOutput.EndOfStream) {
@@ -129,8 +131,7 @@ public class Util {
         return output.TrimEnd('\n');
     }
 
-    public static IAsyncEnumerable<string> GetCommandOutputAsync(string command, string args = "", bool silent = true, bool stdout = true,
-        bool stderr = true) =>
+    public static IAsyncEnumerable<string> GetCommandOutputAsync(string command, string args = "", bool silent = true, bool stdout = true, bool stderr = true) =>
         GetCommandOutputInDirAsync(Environment.CurrentDirectory, command, args, silent, stdout, stderr);
 
     public static async IAsyncEnumerable<string> GetCommandOutputInDirAsync(string path, string command, string args = "", bool silent = true,

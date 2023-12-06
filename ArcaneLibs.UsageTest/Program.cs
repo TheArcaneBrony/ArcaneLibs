@@ -48,19 +48,19 @@ var c = autodict3[6];
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c asdf"));
 Console.WriteLine(Util.GetCommandOutputSync("bash", "-c ls"));
 
-RandomClass arc = new RandomClass() {
+var arc = new RandomClass {
     Id = 1,
     Name = "asdf",
     DateCreated = DateTime.Now,
-    SubClassInst = new() {
+    SubClassInst = new RandomClass.SubClass {
         Description = "asdf"
     }
 };
-RandomClass brc = new RandomClass() {
+var brc = new RandomClass {
     Id = 2,
     Name = "asdf",
     DateCreated = DateTime.Now,
-    SubClassInst = new() {
+    SubClassInst = new RandomClass.SubClass {
         Description = "asdf"
     }
 };

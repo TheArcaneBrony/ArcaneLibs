@@ -1,13 +1,15 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace ArcaneLibs;
+namespace ArcaneLibs.Timings;
 
 public class Timing {
     public bool PrintTimings;
 
+    public ConcurrentDictionary<string, Stopwatch> Timings = new();
+
     public Stopwatch StartTiming(string name, int timeoutMs = 60000) {
-        var sw = Timings.GetOrAdd(name, (_) => {
+        var sw = Timings.GetOrAdd(name, _ => {
             var lsw = new Stopwatch();
             lsw.Start();
             return lsw;
@@ -52,7 +54,7 @@ public class Timing {
             Console.WriteLine(
                 $"Stopped timer {Timings.FirstOrDefault(x => x.Value == old).Key}: {old.ElapsedMilliseconds} ms, moving on to {name}.");
 
-        var sw = Timings.GetOrAdd(name, (_) => {
+        var sw = Timings.GetOrAdd(name, _ => {
             var lsw = new Stopwatch();
             lsw.Start();
             return lsw;
@@ -77,6 +79,4 @@ public class Timing {
         sw.Stop();
         return sw;
     }
-
-    public ConcurrentDictionary<string, Stopwatch> Timings = new();
 }

@@ -1,68 +1,88 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-namespace ArcaneLibs;
+namespace ArcaneLibs.Legacy;
 
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class DownloadQueue {
-    public List<DownloadInfo> queue = new();
-    public List<DownloadInfo> running => queue.Where(x => x.Running).ToList();
-
-    public void Add(DownloadInfo info) => queue.Add(info);
-
+    // ReSharper disable once FieldCanBeMadeReadOnly.Global
     public int MaxConcurrentDownloads = 4;
-    public bool UpdatingQueue = true;
 
-    public bool AllDownloadsFinished => !queue.Any(x => x.Progress < 1);
-    private int maxWidth => queue.Max(x => x.FileName.Length);
-    public Func<DownloadQueue, bool> ShouldQueueMore = (q) => q.running.Count >= q.MaxConcurrentDownloads;
+    public readonly List<DownloadInfo> Queue = new();
+
+    // ReSharper disable once FieldCanBeMadeReadOnly.Global
+    public Func<DownloadQueue, bool> ShouldQueueMore = q => q.IsRunning.Count >= q.MaxConcurrentDownloads;
+
+    // ReSharper disable once FieldCanBeMadeReadOnly.Global
+    // ReSharper disable once ConvertToConstant.Global
+    public bool UpdatingQueue = true;
+    public List<DownloadInfo> IsRunning => Queue.Where(x => x.Running).ToList();
+
+    public bool AllDownloadsFinished => !Queue.Any(x => x.Progress < 1);
+    private int MaxWidth => Queue.Max(x => x.FileName.Length);
+
+    public void Add(DownloadInfo info) => Queue.Add(info);
 
     public async Task Run() {
-        foreach (var n in queue.Where(x => x.Size == 0)) File.Create(n.TargetFile).Close();
+        foreach (var n in Queue.Where(x => x.Size == 0)) File.Create(n.TargetFile).Close();
 
-        queue.RemoveAll(x => x.Size == 0);
+        Queue.RemoveAll(x => x.Size == 0);
+        List<Task> tasks = new();
         while (!AllDownloadsFinished || UpdatingQueue) {
             while (!ShouldQueueMore(this))
                 // Console.Clear();
                 // Console.WriteLine(GetProgressBars());
                 await Task.Delay(10);
 
-            if (queue.Any(x => x.Progress == 0 && !x.Running))
-                queue.First(x => x.Progress == 0 && !x.Running).StartDownload();
+            if (Queue.Any(x => x.Progress == 0 && !x.Running))
+                tasks.Add(Queue.First(x => x.Progress == 0 && !x.Running).Download());
         }
+
+        await Task.WhenAll(tasks);
     }
 
     public string GetProgressBars(int width = 100) {
-        int p = (int)(queue.Average(x => x.Progress) * width), np = width - p;
-        var header = $"{"Total".PadRight(maxWidth)} " +
+        int p = (int)(Queue.Average(x => x.Progress) * width), np = width - p;
+        var header = $"{"Total".PadRight(MaxWidth)} " +
                      $"[{new string('=', Math.Max(p, 0))}>" +
                      $"{new string(' ', Math.Max(np, 0))}]\n";
         return header + string.Join("\n",
-            running.Select(x => $"{x.FileName.PadRight(maxWidth)} " +
-                                $"[{new string('=', x.ProgressInt)}>" +
-                                $"{new string(' ', 100 - x.ProgressInt)}]"));
+            IsRunning.Select(x => $"{x.FileName.PadRight(MaxWidth)} " +
+                                  $"[{new string('=', x.ProgressInt)}>" +
+                                  $"{new string(' ', 100 - x.ProgressInt)}]"));
     }
 }
 
+[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global", Justification = "Public API")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Public API")]
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global", Justification = "Public API")]
+[SuppressMessage("ReSharper", "ConvertToConstant.Global", Justification = "Public API")]
 public class DownloadInfo {
-    public string TargetFile = "";
+    public long BytesDownloaded;
     public string FileName = "";
-    public string Url = "";
-    public long Size = 0;
 
-    public bool Running = false;
+    public bool Running;
+    public long Size = 0;
+    public string TargetFile = "";
+    public string Url = "";
     public string TargetFilename => Url.Split("/").Last();
-    public long BytesDownloaded = 0;
     public float Progress => (float)(BytesDownloaded / (double)Size);
     public int ProgressInt => (int)Math.Max(0, Math.Min(Progress * 100, 100));
 
-    internal void StartDownload() {
+    internal async Task Download() {
         Running = true;
-        var client = new WebClient();
-        client.DownloadProgressChanged += (_, args) => BytesDownloaded = args.BytesReceived;
-        client.DownloadFileCompleted += (_, _) => {
-            BytesDownloaded = Size;
-            Running = false;
-        };
+        using var client = new HttpClient();
+        var response = await client.GetStreamAsync(Url);
+        var stream = File.OpenWrite(TargetFile);
+        byte[] buffer = new byte[4096];
+        int read;
+        while ((read = await response.ReadAsync(buffer)) > 0) {
+            BytesDownloaded += read;
+            await stream.WriteAsync(buffer, 0, read);
+        }
+
+        BytesDownloaded = Size;
+        Running = false;
         if (File.Exists(TargetFile)) File.Delete(TargetFile);
-        client.DownloadFileAsync(new Uri(Url), TargetFile);
     }
 }

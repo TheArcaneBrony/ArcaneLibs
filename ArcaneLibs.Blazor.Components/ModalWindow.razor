@@ -1,5 +1,3 @@
-@using Microsoft.JSInterop
-@using ArcaneLibs.Extensions
 <div class="r-modal" style="top: @(_y)px; left: @(_x)px;">
     <div class="titlebar" @onmousedown="MouseDown" @onmouseup="MouseUp" @onmousemove="MouseMove" @onmouseleave="MouseMove">
         <b class="title" @ref="_titleRef">@Title</b>
@@ -29,10 +27,10 @@
     public double MinWidth { get; set; } = 100;
 
     [Parameter]
-    public Action OnCloseClicked { get; set; }
+    public required Action OnCloseClicked { get; set; }
 
     [Parameter]
-    public bool Collapsed { get; set; } = false;
+    public bool Collapsed { get; set; }
 
     private ElementReference _titleRef;
 
@@ -45,42 +43,36 @@
         await base.OnInitializedAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-    //set minwidth to title width
-        // MinWidth = await JSRuntime.InvokeAsync<int>("getWidth", _titleRef) + 75;
-        await base.OnAfterRenderAsync(firstRender);
-    }
+    protected override async Task OnAfterRenderAsync(bool firstRender) => await base.OnAfterRenderAsync(firstRender);
 
-    private void WindowDrag(DragEventArgs obj) {
-        Console.WriteLine("Drag: " + obj.ToJson());
+    // private void WindowDrag(DragEventArgs obj) {
+    //     Console.WriteLine("Drag: " + obj.ToJson());
+    //
+    //     _x += obj.MovementX;
+    //     _y += obj.MovementY;
+    //
+    //     StateHasChanged();
+    // }
 
-        _x += obj.MovementX;
-        _y += obj.MovementY;
-
-        StateHasChanged();
-    }
-
-    private bool isDragging = false;
-    private double dragX = 0;
-    private double dragY = 0;
+    private bool _isDragging;
+    private double _dragX;
+    private double _dragY;
 
     private void MouseDown(MouseEventArgs obj) {
-        isDragging = true;
-        dragX = obj.ClientX;
-        dragY = obj.ClientY;
+        _isDragging = true;
+        _dragX = obj.ClientX;
+        _dragY = obj.ClientY;
     }
 
-    private void MouseUp(MouseEventArgs obj) {
-        isDragging = false;
-    }
+    private void MouseUp(MouseEventArgs obj) => _isDragging = false;
 
     private void MouseMove(MouseEventArgs obj) {
-        if (!isDragging) return;
+        if (!_isDragging) return;
 
-        _x += obj.ClientX - dragX;
-        _y += obj.ClientY - dragY;
-        dragX = obj.ClientX;
-        dragY = obj.ClientY;
+        _x += obj.ClientX - _dragX;
+        _y += obj.ClientY - _dragY;
+        _dragX = obj.ClientX;
+        _dragY = obj.ClientY;
         StateHasChanged();
     }
 

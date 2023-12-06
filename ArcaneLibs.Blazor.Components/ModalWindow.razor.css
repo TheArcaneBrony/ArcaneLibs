@@ -4,6 +4,7 @@
     height: fit-content;
     z-index: 1000;
 }
+
 .r-modal:hover {
     z-index: 1001;
 }
@@ -43,6 +44,7 @@
     background-color: #111;
     cursor: pointer;
 }
+
 .r-modal > .titlebar > .btncollapse {
     position: absolute;
     top: 0;

@@ -1,7 +1,7 @@
 namespace ArcaneLibs.Logging.LogEndpoints;
 
 public class FileEndpoint : BaseEndpoint {
-    private StreamWriter _stream;
+    private readonly StreamWriter _stream;
 
     public FileEndpoint(string path, bool append) {
         _stream = new StreamWriter(path, append);

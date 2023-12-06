@@ -3,26 +3,24 @@
     @ChildContent
 </a>
 
+@* ReSharper disable once InconsistentNaming *@
 @code {
 
     [Parameter]
     public string? href { get; set; }
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public required RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public string? Color { get; set; }
 
     [Parameter]
     public Func<Task>? OnClick { get; set; }
-    
+
     [Parameter]
     public bool Round { get; set; }
 
-    private void Callback() {
-        if (OnClick is not null)
-            OnClick();
-    }
+    private void Callback() => OnClick?.Invoke();
 
 }

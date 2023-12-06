@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace ArcaneLibs;
 
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class ClassCollector<T> where T : class {
     static ClassCollector() {
         if (!typeof(T).IsInterface && !typeof(T).IsAbstract)

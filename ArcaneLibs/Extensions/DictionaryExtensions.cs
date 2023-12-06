@@ -1,13 +1,19 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Text;
 
 namespace ArcaneLibs.Extensions;
 
+[SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Public API: extension methods")]
 public static class DictionaryExtensions {
-    public static bool ChangeKey<TKey, TValue>(this IDictionary<TKey, TValue> dict,
-        TKey oldKey, TKey newKey) {
-        TValue value;
-        if (!dict.Remove(oldKey, out value))
+    public static void RemoveAll<K, V>(this IDictionary<K, V> dict, Func<K, V, bool> match) {
+        foreach (var key in dict.Keys.ToArray()
+                     .Where(key => match(key, dict[key])))
+            dict.Remove(key);
+    }
+
+    public static bool ChangeKey<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey oldKey, TKey newKey) {
+        if (!dict.Remove(oldKey, out var value))
             return false;
 
         dict[newKey] = value; // or dict.Add(newKey, value) depending on ur comfort
@@ -26,17 +32,18 @@ public static class DictionaryExtensions {
         if (dict.TryGetValue(key, out var value)) return value;
 
         value = valueFactory(key);
-        lock (dict)
+        lock (dict) {
             dict.TryAdd(key, value);
+        }
+
         return value;
     }
 
-    public static async Task<Y> GetOrCreateAsync<X, Y>(this IDictionary<X, Y> dict, X key, Func<X, Task<Y>> valueFactory, SemaphoreSlim? semaphore = null) {
+    public static async Task<TY?> GetOrCreateAsync<TX, TY>(this IDictionary<TX, TY> dict, TX key, Func<TX, Task<TY>> valueFactory, SemaphoreSlim? semaphore = null) {
         if (semaphore is not null) await semaphore.WaitAsync();
-        Y value;
         // lock (dict) {
-        if (dict.TryGetValue(key, out value)) {
-            if (semaphore is not null) semaphore.Release();
+        if (dict.TryGetValue(key, out var value)) {
+            semaphore?.Release();
             return value;
         }
 
@@ -44,12 +51,14 @@ public static class DictionaryExtensions {
         dict.TryAdd(key, value);
         // }
 
-        if (semaphore is not null) semaphore.Release();
+        semaphore?.Release();
         return value;
     }
 
     public static bool StartsWith<T>(this IEnumerable<T> list, IEnumerable<T> prefix) {
-        return prefix.SequenceEqual(list.Take(prefix.Count()));
+        var array = prefix as T[] ?? prefix.ToArray();
+        var prefixLen = array.Length;
+        return array.SequenceEqual(list.Take(prefixLen));
     }
 
     public static void HexDump(this IEnumerable<byte> bytes, int width = 32) {
@@ -78,7 +87,7 @@ public static class DictionaryExtensions {
     //zlib decompress
     public static byte[] ZlibDecompress(this IEnumerable<byte> bytes) {
         var inStream = new MemoryStream(bytes.ToArray());
-        using ZLibStream stream = new ZLibStream(inStream, CompressionMode.Decompress);
+        using var stream = new ZLibStream(inStream, CompressionMode.Decompress);
         using var result = new MemoryStream();
         stream.CopyTo(result);
         stream.Flush();
@@ -86,7 +95,5 @@ public static class DictionaryExtensions {
         return result.ToArray();
     }
 
-    public static T GetByCaseInsensitiveKey<T>(this IDictionary<string, T> dict, string key) {
-        return dict.First(x => x.Key.ToLower() == key.ToLower()).Value;
-    }
+    public static T GetByCaseInsensitiveKey<T>(this IDictionary<string, T> dict, string key) => dict.First(x => x.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase)).Value;
 }

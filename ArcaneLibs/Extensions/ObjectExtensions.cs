@@ -1,57 +1,44 @@
+using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ArcaneLibs.Extensions;
 
+[SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Public API: extension functions")]
 public static class ObjectExtensions {
-    public static void SaveToJsonFile(this object @object, string filename) // save object to json file
-        =>
-            /*
-        JsonSerializerSettings settings = new JsonSerializerSettings()
-        {
-            DefaultValueHandling = DefaultValueHandling.Populate,
-        };
-        settings.Converters.Add(new StringEnumConverter());
-        // serialise object
-        string json = JsonConvert.SerializeObject(@object, Formatting.Indented, settings);
-        // save to files
-        try
-        {
-            Util.WriteAllTextIfDifferent(filename, json);
-        }
-        catch
-        {
-            // ignored
-        }*/
-            File.WriteAllText(filename, ToJson(@object, true, false, false));
+    public static void SaveToJsonFile(this object? @object, string filename) => File.WriteAllText(filename, ToJson(@object));
 
-    public static string ToJson(this object obj, bool indent = true, bool ignoreNull = false,
-        bool unsafeContent = false) {
-        var jso = new JsonSerializerOptions();
-        if (indent) jso.WriteIndented = true;
-        if (ignoreNull) jso.IgnoreNullValues = true;
-        if (unsafeContent) jso.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-        return JsonSerializer.Serialize(obj, obj.GetType(), jso);
+    private static readonly JsonSerializerOptions ToJsonSerializerOptions = new JsonSerializerOptions();
+
+    public static string ToJson(this object? obj, bool indent = true, bool ignoreNull = false, bool unsafeContent = false) {
+        if (obj is null) return "";
+        ToJsonSerializerOptions.WriteIndented = indent;
+        ToJsonSerializerOptions.DefaultIgnoreCondition = ignoreNull ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never;
+        ToJsonSerializerOptions.Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null;
+        return JsonSerializer.Serialize(obj, obj.GetType(), ToJsonSerializerOptions);
     }
 
-    public static T DeepClone<T>(this T obj) where T : class {
-        var type = obj.GetType();
+    public static T? DeepClone<T>(this T? obj) where T : class {
+        if (obj is null) return null;
+        var type = typeof(T);
         if (type.IsValueType || type == typeof(string)) return obj;
         if (type.IsArray) {
-            var elementType = Type.GetType(
-                type.FullName.Replace("[]", string.Empty));
+            if (type.FullName is null) throw new NullReferenceException($"{nameof(type.FullName)} is null!");
+            var elementType = Type.GetType(type.FullName.Replace("[]", string.Empty));
+            if (elementType is null) throw new NullReferenceException("Could not resolve array type!");
             var array = obj as Array;
-            var copied = Array.CreateInstance(elementType, array.Length);
-            for (var i = 0; i < array.Length; i++) {
-                copied.SetValue(DeepClone(array.GetValue(i)), i);
-            }
+            var copied = Array.CreateInstance(elementType, array!.Length);
+            for (var i = 0; i < array.Length; i++) copied.SetValue(DeepClone(array.GetValue(i)), i);
 
             return Convert.ChangeType(copied, obj.GetType()) as T;
         }
 
         if (type.IsClass) {
-            var instance = Activator.CreateInstance(obj.GetType());
+            // ReSharper disable once SuggestVarOrType_SimpleTypes
+            var instance = Activator.CreateInstance<T>();
             var fields = type.GetFields(BindingFlags.Public |
                                         BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var field in fields) {
@@ -60,37 +47,44 @@ public static class ObjectExtensions {
                 field.SetValue(instance, DeepClone(fieldValue));
             }
 
-            return (T)instance;
+            return instance;
         }
 
         throw new ArgumentException("Unknown type");
     }
 
-    public static (T left, T right) FindDifferencesDeep<T>(this T left, T right) where T : class {
-        var type = left.GetType();
+    public static (T? left, T? right) FindDifferencesDeep<T>(this T? left, T? right) where T : class {
+        // don't bother if either left or right are null
+        if (left is null && right is not null) return (null, right);
+        if (left is not null && right is null) return (left, null);
+        if (left is null && right is null) return (null, null);
+        
+        var type = typeof(T);
         if (type.IsValueType || type == typeof(string)) return (left, right);
         if (type.IsArray) {
-            var elementType = Type.GetType(
-                type.FullName.Replace("[]", string.Empty));
-            var arrayLeft = left as Array;
-            var arrayRight = right as Array;
-            var copiedLeft = Array.CreateInstance(elementType, arrayLeft.Length);
-            var copiedRight = Array.CreateInstance(elementType, arrayRight.Length);
-            for (var i = 0; i < arrayLeft.Length; i++) {
-                var tuple = FindDifferencesDeep(arrayLeft.GetValue(i), arrayRight.GetValue(i));
-                copiedLeft.SetValue(tuple.left, i);
-                copiedRight.SetValue(tuple.right, i);
+            if (type.FullName is null) throw new NullReferenceException($"{nameof(type.FullName)} is null!");
+            var elementType = Type.GetType(type.FullName.Replace("[]", string.Empty));
+            if (elementType is null) throw new NullReferenceException("Could not resolve array type!");
+            if (left is Array arrayLeft && right is Array arrayRight) {
+                var copiedLeft = Array.CreateInstance(elementType, arrayLeft.Length);
+                var copiedRight = Array.CreateInstance(elementType, arrayRight.Length);
+                for (var i = 0; i < arrayLeft.Length; i++) {
+                    var tuple = FindDifferencesDeep(arrayLeft.GetValue(i), arrayRight.GetValue(i));
+                    copiedLeft.SetValue(tuple.left, i);
+                    copiedRight.SetValue(tuple.right, i);
+                }
+
+                return ((T)Convert.ChangeType(copiedLeft, left.GetType()),
+                    (T)Convert.ChangeType(copiedRight, right.GetType()));
             }
 
-            return ((T)Convert.ChangeType(copiedLeft, left.GetType()),
-                (T)Convert.ChangeType(copiedRight, right.GetType()));
+            throw new InvalidCastException($"T is array, but either left or right are not!\nPassed values:\nLeft: {left!.GetType()}\nRight: {right!.GetType()}");
         }
 
         if (type.IsClass) {
-            var instanceLeft = Activator.CreateInstance(left.GetType());
-            var instanceRight = Activator.CreateInstance(right.GetType());
-            var fields = type.GetFields(BindingFlags.Public |
-                                        BindingFlags.NonPublic | BindingFlags.Instance);
+            var instanceLeft = Activator.CreateInstance<T>();
+            var instanceRight = Activator.CreateInstance<T>();
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (var field in fields) {
                 var fieldValueLeft = field.GetValue(left);
                 var fieldValueRight = field.GetValue(right);
@@ -104,6 +98,6 @@ public static class ObjectExtensions {
             return ((T)instanceLeft, (T)instanceRight);
         }
 
-        throw new ArgumentException("Unknown type");
+        throw new ArgumentException($"Unknown type: {type}");
     }
 }

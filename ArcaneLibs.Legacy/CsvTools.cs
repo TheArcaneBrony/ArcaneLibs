@@ -1,19 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 
-namespace ArcaneLibs;
+namespace ArcaneLibs.Legacy;
 
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class CsvTools {
     public static string ToCsvHeader<T>(string separator) {
         var t = typeof(T);
-        PropertyInfo[] fields = t.GetProperties();
+        var fields = t.GetProperties();
         var header = string.Join(separator, fields.Select(f => f.Name).ToArray());
         return header;
     }
 
-    public static string ToCsv<T>(string separator, IEnumerable<T> objectlist) {
+    public static string ToCsv<T>(string separator, IEnumerable<T> objectlist) where T : notnull {
         var t = typeof(T);
-        PropertyInfo[] fields = t.GetProperties();
+        var fields = t.GetProperties();
 
         var csvdata = new StringBuilder();
 
@@ -33,7 +35,7 @@ public class CsvTools {
             var x = f.GetValue(o);
 
             if (x != null)
-                line.Append(x.ToString());
+                line.Append(x);
         }
 
         return line.ToString();

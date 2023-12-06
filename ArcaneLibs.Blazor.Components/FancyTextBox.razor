@@ -1,16 +1,16 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime
-@if (isVisible) {
-    <input autofocus type="@(IsPassword ? "password" : "text")" @bind="Value" @onfocusout="() => { isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="elementToFocus"/>
+@if (_isVisible) {
+    <input autofocus type="@(IsPassword ? "password" : "text")" @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"/>
 }
 else {
-    <span class="fancy-textbox-inline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => isVisible = true">@(Formatter?.Invoke(Value) ?? (IsPassword ? string.Join("", Value.Select(x => '*')) : Value))</span>
+    <span class="fancy-textbox-inline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true">@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</span>
 }
 
 @code {
 
     [Parameter]
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
     [Parameter]
     public bool IsPassword { get; set; } = false;
@@ -21,15 +21,15 @@ else {
     [Parameter]
     public Func<string?, string>? Formatter { get; set; }
 
-    private bool isVisible { get; set; } = false;
+    private bool _isVisible = false;
 
-    private ElementReference elementToFocus;
+    private ElementReference? _elementToFocus;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) => await JsRuntime.InvokeVoidAsync("BlazorFocusElement", elementToFocus);
+    protected override async Task OnAfterRenderAsync(bool firstRender) => await JsRuntime.InvokeVoidAsync("BlazorFocusElement", _elementToFocus);
 
     [Parameter]
     public string ForegroundColor { get; set; } = "#ffffffff";
-    
+
     [Parameter]
     public string BackgroundColor { get; set; } = "#00000000";
 
