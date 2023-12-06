@@ -6,9 +6,8 @@ namespace ArcaneLibs.Extensions;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Public API: extension methods")]
 public static class DictionaryExtensions {
-    public static void RemoveAll<K, V>(this IDictionary<K, V> dict, Func<K, V, bool> match) {
-        foreach (var key in dict.Keys.ToArray()
-                     .Where(key => match(key, dict[key])))
+    public static void RemoveAll<TK, TV>(this IDictionary<TK, TV> dict, Func<TK, TV, bool> match) {
+        foreach (var key in dict.Keys.ToArray().Where(key => match(key, dict[key])))
             dict.Remove(key);
     }
 
@@ -16,19 +15,19 @@ public static class DictionaryExtensions {
         if (!dict.Remove(oldKey, out var value))
             return false;
 
-        dict[newKey] = value; // or dict.Add(newKey, value) depending on ur comfort
+        dict[newKey] = value;
         return true;
     }
 
-    public static Y GetOrCreate<X, Y>(this IDictionary<X, Y> dict, X key) where Y : new() {
+    public static TY GetOrCreate<TX, TY>(this IDictionary<TX, TY> dict, TX key) where TY : new() {
         if (dict.TryGetValue(key, out var value)) return value;
 
-        value = new Y();
+        value = new TY();
         dict.Add(key, value);
         return value;
     }
 
-    public static Y GetOrCreate<X, Y>(this IDictionary<X, Y> dict, X key, Func<X, Y> valueFactory) {
+    public static TY GetOrCreate<TX, TY>(this IDictionary<TX, TY> dict, TX key, Func<TX, TY> valueFactory) {
         if (dict.TryGetValue(key, out var value)) return value;
 
         value = valueFactory(key);
