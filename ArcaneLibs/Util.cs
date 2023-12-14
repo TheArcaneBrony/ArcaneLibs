@@ -51,30 +51,30 @@ public static class Util {
             }
     }
 
-    public static void DownloadFile(string contextName, string url, string filename, bool overwrite = false, bool extract = false, bool printProgress = true) {
-        using var wc = new WebClient();
-        if (File.Exists(filename) && !overwrite) {
-            Console.WriteLine($"Not downloading {filename}, file exists.");
-            return;
-        }
-
-        if (File.Exists(filename)) File.Delete(filename);
-
-        if (printProgress)
-            wc.DownloadProgressChanged += (_, args) => { Console.Write($"Downloading {contextName}... {args.ProgressPercentage}%\r"); };
-        wc.DownloadFileCompleted += (_, _) => {
-            //Console.WriteLine(printProgress?"\n":"" + $"Finished downloading {contextName}");
-        };
-        wc.DownloadFileTaskAsync(new Uri(url), filename).Wait();
-        Console.WriteLine($"Downloading {contextName}... [DONE]");
-        if (extract) {
-            Console.WriteLine($"Extracting {contextName}...");
-            ZipFile.ExtractToDirectory(filename, contextName, overwrite);
-            File.Delete(filename);
-        }
-
-        while (wc.IsBusy) Thread.Sleep(1000);
-    }
+    // public static void DownloadFile(string contextName, string url, string filename, bool overwrite = false, bool extract = false, bool printProgress = true) {
+    //     using var wc = new WebClient();
+    //     if (File.Exists(filename) && !overwrite) {
+    //         Console.WriteLine($"Not downloading {filename}, file exists.");
+    //         return;
+    //     }
+    //
+    //     if (File.Exists(filename)) File.Delete(filename);
+    //
+    //     if (printProgress)
+    //         wc.DownloadProgressChanged += (_, args) => { Console.Write($"Downloading {contextName}... {args.ProgressPercentage}%\r"); };
+    //     wc.DownloadFileCompleted += (_, _) => {
+    //         //Console.WriteLine(printProgress?"\n":"" + $"Finished downloading {contextName}");
+    //     };
+    //     wc.DownloadFileTaskAsync(new Uri(url), filename).Wait();
+    //     Console.WriteLine($"Downloading {contextName}... [DONE]");
+    //     if (extract) {
+    //         Console.WriteLine($"Extracting {contextName}...");
+    //         ZipFile.ExtractToDirectory(filename, contextName, overwrite);
+    //         File.Delete(filename);
+    //     }
+    //
+    //     while (wc.IsBusy) Thread.Sleep(1000);
+    // }
 
     public static int Min(params int[] numbers) => numbers.Min();
 

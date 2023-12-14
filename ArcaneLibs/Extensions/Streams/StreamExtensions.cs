@@ -5,7 +5,7 @@ namespace ArcaneLibs.Extensions.Streams;
 
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static class StreamExtensions {
-    private const bool _debug = false;
+    // private const bool _debug = false;
 
     public static long Remaining(this Stream stream) =>
         //if (_debug) if (_debug) Console.WriteLine($"stream pos: {stream.Position}, stream len: {stream.Length}, stream rem: {stream.Length - stream.Position}");
@@ -95,7 +95,7 @@ public static class StreamExtensions {
         return true;
     }
 
-    public static bool StartsWith(this Stream stream, string ascii_seq) => stream.StartsWith(ascii_seq.Select(x => (byte)x));
+    public static bool StartsWith(this Stream stream, string asciiSeq) => stream.StartsWith(asciiSeq.Select(x => (byte)x));
 
     public static Stream Skip(this Stream stream, long count = 1) {
         if (!stream.CanSeek)
@@ -181,7 +181,7 @@ public static class StreamExtensions {
         if (!stream.CanRead)
             throw new InvalidOperationException("Can't read a non-readable stream");
 
-        var read = 0;
+        int read;
         while ((read = stream.ReadByte()) != -1)
             yield return (byte)read;
     }

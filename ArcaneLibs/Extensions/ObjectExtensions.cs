@@ -1,4 +1,3 @@
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Encodings.Web;
@@ -11,17 +10,21 @@ namespace ArcaneLibs.Extensions;
 public static class ObjectExtensions {
     public static void SaveToJsonFile(this object? @object, string filename) => File.WriteAllText(filename, ToJson(@object));
 
-    private static readonly JsonSerializerOptions ToJsonSerializerOptions = new JsonSerializerOptions();
+    private static readonly Dictionary<byte, JsonSerializerOptions> OptionsCache = new();
 
     public static string ToJson(this object? obj, bool indent = true, bool ignoreNull = false, bool unsafeContent = false) {
         if (obj is null) return "";
-        ToJsonSerializerOptions.WriteIndented = indent;
-        ToJsonSerializerOptions.DefaultIgnoreCondition = ignoreNull ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never;
-        ToJsonSerializerOptions.Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null;
-        return JsonSerializer.Serialize(obj, obj.GetType(), ToJsonSerializerOptions);
+        var cacheKey = (byte)((indent ? 1 : 0) | (ignoreNull ? 2 : 0) | (unsafeContent ? 4 : 0));
+        var options = OptionsCache.GetOrCreate(cacheKey , _ => new JsonSerializerOptions {
+            WriteIndented = indent,
+            DefaultIgnoreCondition = ignoreNull ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never,
+            Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null
+        });
+        return JsonSerializer.Serialize(obj, obj.GetType(), options);
     }
 
     public static T? DeepClone<T>(this T? obj) where T : class {
+        Console.WriteLine($"DeepClone<{typeof(T)}>");
         if (obj is null) return null;
         var type = typeof(T);
         if (type.IsValueType || type == typeof(string)) return obj;
@@ -44,7 +47,9 @@ public static class ObjectExtensions {
             foreach (var field in fields) {
                 var fieldValue = field.GetValue(obj);
                 if (fieldValue == null) continue;
-                field.SetValue(instance, DeepClone(fieldValue));
+                var newValue = DeepClone(fieldValue);
+                Console.WriteLine($"{field.Name}: {fieldValue.GetType().Name} -> {newValue.GetType().Name}");
+                field.SetValue(instance, newValue);
             }
 
             return instance;
@@ -58,7 +63,7 @@ public static class ObjectExtensions {
         if (left is null && right is not null) return (null, right);
         if (left is not null && right is null) return (left, null);
         if (left is null && right is null) return (null, null);
-        
+
         var type = typeof(T);
         if (type.IsValueType || type == typeof(string)) return (left, right);
         if (type.IsArray) {
@@ -95,7 +100,7 @@ public static class ObjectExtensions {
                 field.SetValue(instanceRight, fieldValueRight);
             }
 
-            return ((T)instanceLeft, (T)instanceRight);
+            return (instanceLeft, instanceRight);
         }
 
         throw new ArgumentException($"Unknown type: {type}");
