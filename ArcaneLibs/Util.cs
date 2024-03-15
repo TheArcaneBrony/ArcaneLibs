@@ -160,7 +160,7 @@ public static class Util {
     }
 
     public static string BytesToString(long byteCount, int maxnums = 2) {
-        string[] suf = { "B", "kiB", "MiB", "GiB", "TiB", "PiB", "EiB" }; //Longs run out around EB
+        string[] suf = ["B", "kiB", "MiB", "GiB", "TiB", "PiB", "EiB"]; //Longs run out around EB
         if (byteCount == 0)
             return "0 " + suf[0];
         var bytes = Math.Abs(byteCount);
@@ -170,7 +170,7 @@ public static class Util {
     }
 
     public static string SI_BytesToString(long byteCount, int maxnums = 2) {
-        string[] suf = { "B", "kB", "MB", "GB", "TB", "PB", "EB" }; //Longs run out around EB
+        string[] suf = ["B", "kB", "MB", "GB", "TB", "PB", "EB"]; //Longs run out around EB
         if (byteCount == 0)
             return "0 " + suf[0];
         var bytes = Math.Abs(byteCount);
