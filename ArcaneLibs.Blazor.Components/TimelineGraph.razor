@@ -1,0 +1,70 @@
+@using ArcaneLibs
+<svg width="@Width" height="@Height">
+    @if (Data.Count > 0) {
+        <polyline points="@string.Join(" ", _points.Select(x => $"{x.Key},{x.Value}"))" style="fill:none;stroke:black;stroke-width:3"/>
+        @* Y min/max labels *@
+        <text>
+            <text x="0" y="@Height" fill="black">@(ValueFormatter.Invoke(_minValue))</text>
+            <text x="0" y="15" fill="black">@(ValueFormatter.Invoke(_maxValue))</text>
+        </text>
+        @* outline *@
+        <rect x="0" y="0" width="@Width" height="@Height" style="fill:none;stroke:black;stroke-width:1"/>
+    }
+</svg>
+
+@code {
+
+    [Parameter]
+    public Dictionary<DateTime, double> Data { get; set; }
+
+    [Parameter]
+    public int Width { get; set; } = 100;
+
+    [Parameter]
+    public int Height { get; set; } = 100;
+
+    [Parameter]
+    public double? MinValue { get; set; }
+
+    [Parameter]
+    public double? MaxValue { get; set; }
+
+    //value formatter
+    [Parameter]
+    public Func<double, string> ValueFormatter { get; set; } = x => x.ToString("X2");
+
+    private double _minValue => MinValue ?? (Data.Count > 0 ? Data.Values.Min() : 0);
+    private double _maxValue => MaxValue ?? (Data.Count > 0 ? Data.Values.Max() : 0);
+
+    private Dictionary<double, double> _points = [];
+
+    protected override async Task OnParametersSetAsync() {
+        await RebuildGraph();
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task RebuildGraph() {
+        if (Data.Count == 0) return;
+        _points.Clear();
+        var startTime = Data.Keys.Min(x => x).Ticks;
+        var endTime = Data.Keys.Max(x => x).Ticks;
+        var minValue = _minValue;
+        var maxValue = _maxValue;
+        // Console.WriteLine($"Start: {startTime}, End: {endTime}, Min: {minValue}, Max: {maxValue}");
+        foreach (var item in Data) {
+            _points.Add(Map(item.Key.Ticks, startTime, endTime, 0, Width),
+                Map(item.Value, minValue, maxValue, Height, 0));
+        }
+    }
+
+    private static double Map(
+        double value,
+        double originalStart,
+        double originalEnd,
+        double newStart,
+        double newEnd) {
+        double num = (newEnd - newStart) / (originalEnd - originalStart);
+        return newStart + (value - originalStart) * num;
+    }
+
+}
