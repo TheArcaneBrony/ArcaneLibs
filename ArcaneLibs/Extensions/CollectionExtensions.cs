@@ -26,4 +26,7 @@ public static class CollectionExtensions {
             yield return (task, await task);
         }
     }
+    
+    public static int GetWidth<T>(this T[,] array) => array.GetLength(1);
+    public static int GetHeight<T>(this T[,] array) => array.GetLength(0);
 }
