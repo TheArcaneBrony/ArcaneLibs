@@ -61,7 +61,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
 
     public TValue this[TKey key] {
         get {
-            Console.WriteLine($"Getting value {key}");
+            // Console.WriteLine($"Getting value {key}");
             return _dictionary[key];
         }
         set {
