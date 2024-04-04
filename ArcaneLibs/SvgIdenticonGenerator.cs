@@ -5,17 +5,15 @@ namespace ArcaneLibs;
 
 public class SvgIdenticonGenerator {
     // based on https://github.com/stewartlord/identicon.js/blob/master/identicon.js
-    
+
     public string BackgroundColor { get; set; } = "#FEFEFEFF";
     public float Saturation { get; set; } = 0.7f;
     public float Brightness { get; set; } = 0.5f;
     public string? ForegroundColor { get; set; }
 
-
     public string Generate(string identity) {
         var hash = SHA1.HashData(identity.AsBytes().ToArray());
-        
-        
+
         var hashArray = new byte[hash.Length];
         for (var i = 0; i < hash.Length; i++) {
             hashArray[i] = hash[i];
@@ -39,13 +37,12 @@ public class SvgIdenticonGenerator {
         svg += "</svg>";
         return svg;
     }
-    
+
     public string GenerateAsBase64(string identity) {
         return Convert.ToBase64String(Generate(identity).AsBytes().ToArray());
     }
-    
+
     public string GenerateAsDataUri(string identity) {
         return $"data:image/svg+xml;base64,{GenerateAsBase64(identity)}";
     }
-
 }
