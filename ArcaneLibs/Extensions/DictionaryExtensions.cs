@@ -54,6 +54,23 @@ public static class DictionaryExtensions {
         return value;
     }
 
+    public static TV? GetOrDefault<TK, TV>(this IDictionary<TK, TV> dict, TK key, TV? defaultValue = default) => dict.TryGetValue(key, out var value) ? value : defaultValue;
+
+    public static async Task<TV?> GetOrDefaultAsync<TK, TV>(this IDictionary<TK, TV> dict, TK key, Func<TK, Task<TV>> valueFactory, SemaphoreSlim? semaphore = null) {
+        if (semaphore is not null) await semaphore.WaitAsync();
+        if (dict.TryGetValue(key, out var value)) {
+            semaphore?.Release();
+            return value;
+        }
+
+        value = await valueFactory(key);
+        dict.TryAdd(key, value);
+        semaphore?.Release();
+        return value;
+    }
+
+    public static TV? GetOrNull<TK, TV>(this IDictionary<TK, TV> dict, TK key) => dict.TryGetValue(key, out var value) ? value : default;
+
     public static bool StartsWith<T>(this IEnumerable<T> list, IEnumerable<T> prefix) {
         var array = prefix as T[] ?? prefix.ToArray();
         var prefixLen = array.Length;
