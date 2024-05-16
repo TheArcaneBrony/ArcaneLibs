@@ -8,11 +8,12 @@ public static class CollectionExtensions {
     }
 
     //return task results async without preserving order
-    public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IEnumerable<Task<T>> tasks) {
+    public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IEnumerable<Task<T>> tasks, bool skipExceptions = false) {
         var taskList = tasks.ToList();
         while (taskList.Count > 0) {
             var task = await Task.WhenAny(taskList);
             taskList.Remove(task);
+            if(skipExceptions && task.IsFaulted) continue; 
             yield return await task;
         }
     }
