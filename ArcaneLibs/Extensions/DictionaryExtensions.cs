@@ -112,4 +112,25 @@ public static class DictionaryExtensions {
     }
 
     public static T GetByCaseInsensitiveKey<T>(this IDictionary<string, T> dict, string key) => dict.First(x => x.Key.Equals(key, StringComparison.CurrentCultureIgnoreCase)).Value;
+
+    //return task results async without preserving order
+    public static async IAsyncEnumerable<(TK, TV)> ToAsyncEnumerable<TK, TV>(this Dictionary<TK, Task<TV>> tasks) where TK : notnull {
+        var taskList = tasks.ToDictionary();
+        while (taskList.Count > 0) {
+            var task = await Task.WhenAny(taskList.Values);
+            var result = taskList.First(x => x.Value == task);
+            taskList.Remove(result.Key);
+            yield return (result.Key, await task);
+        }
+    }
+    
+    public static async IAsyncEnumerable<TK> ToAsyncEnumerable<TK>(this Dictionary<TK, Task> tasks) where TK : notnull {
+        var taskList = tasks.ToDictionary();
+        while (taskList.Count > 0) {
+            var task = await Task.WhenAny(taskList.Values);
+            var result = taskList.First(x => x.Value == task).Key;
+            taskList.Remove(result);
+            yield return result;
+        }
+    }
 }
