@@ -127,7 +127,7 @@ public static class StreamExtensions {
                     $"Text prefix {stream.Peek(asciiPrefix.Length).AsHexString()} ({stream.Peek(asciiPrefix.Length).AsString()}) does not match expected value of {asciiPrefix.AsBytes().AsHexString()} ({asciiPrefix})!");
             else stream.Skip(asciiPrefix.Length);
 
-        var read = 0;
+        // var read = 0;
         while (stream.Peek() != terminator) {
             // if (_debug)
             //     Console.WriteLine(
@@ -137,7 +137,7 @@ public static class StreamExtensions {
                 yield break;
             }
 
-            read++;
+            // read++;
             yield return (byte)stream.ReadByte();
         }
 

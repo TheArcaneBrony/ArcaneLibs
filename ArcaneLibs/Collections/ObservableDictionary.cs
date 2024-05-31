@@ -16,7 +16,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
     }
 
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public int Count => _dictionary.Count;
     public bool IsReadOnly => false;
@@ -42,8 +42,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
     }
 
     public bool Remove(TKey key) {
-        if (!_dictionary.ContainsKey(key)) return false;
-        var value = _dictionary[key];
+        if (!_dictionary.TryGetValue(key, out var value)) return false;
         var result = _dictionary.Remove(key);
         if (result) {
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue>(key, value)));
