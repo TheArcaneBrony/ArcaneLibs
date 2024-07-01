@@ -1,0 +1,67 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+<img src="@_finalBlob" srcref="@(_self)"  @attributes="@(OtherAttributes!)"/> @* @ref="Self" *@
+
+@code {
+    private static IJSObjectReference? _streamExtensionsModule;
+    private static SemaphoreSlim _importSemaphore = new(1, 1);
+    private static SemaphoreSlim _streamSemaphore = new(16, 16);
+    private string _self = Guid.NewGuid().ToString();
+
+    private Stream? _stream;
+
+    // private ElementReference Self {
+        // get => _self;
+        // set {
+            // Console.WriteLine($"StreamedImage: {_self.Id} -> {value.Id}");
+            // _self = value;
+        @* } *@
+    @* } *@
+
+    private string? _finalBlob;
+    private CancellationTokenSource _cts = new();
+    // private ElementReference _self;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> OtherAttributes { get; set; } = [];
+
+    [Parameter]
+    public Stream? Stream {
+        get => _stream;
+        set {
+            if (_stream == value) return;
+            _stream = value;
+            _cts.Cancel();
+            _cts = new();
+            _ = StreamHasChanged(value, _cts.Token);
+        }
+    }
+
+    protected override async Task OnInitializedAsync() { }
+
+    private async Task StreamHasChanged(Stream? stream, CancellationToken? cancellationToken) {
+        if (stream is null) return;
+        await _importSemaphore.WaitAsync();
+        if (_streamExtensionsModule is null) {
+            Console.WriteLine("Importing StreamedImage JS module");
+            _streamExtensionsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/StreamedImage.razor.js");
+            Console.WriteLine("Successfully imported StreamedImage JS module");
+        }
+        _importSemaphore.Release();
+
+        StateHasChanged();
+
+        using var streamRef = new DotNetStreamReference(stream, true);
+        // Console.WriteLine($"StreamedImage: got streamRef {streamRef.GetHashCode()} for stream {stream.GetHashCode()}");
+        await _streamSemaphore.WaitAsync();
+        Console.WriteLine($"StreamedImage: Attempting to invoke streamImage({streamRef}, {_self})");
+        var finalBlob = await _streamExtensionsModule.InvokeAsync<string>("streamImage", streamRef, _self);
+        _streamSemaphore.Release();
+        // Console.WriteLine("StreamedImage.razor: got finalBlob " + finalBlob);
+        // var finalBlob = await JSRuntime.streamImage(Stream, Self);
+        if (cancellationToken is { IsCancellationRequested: true }) return;
+        _finalBlob = finalBlob;
+        StateHasChanged();
+    }
+
+}

@@ -9,7 +9,6 @@ public static class UriExtensions {
         var newQuery = HttpUtility.ParseQueryString(query ?? "");
         newQuery[name] = value;
         // Console.WriteLine("OriginalString: " + uri.OriginalString);
-        
         return new Uri(location + "?" + newQuery, uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative);
     }
 }
