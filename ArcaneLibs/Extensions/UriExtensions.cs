@@ -1,3 +1,4 @@
+using System.Text;
 using System.Web;
 
 namespace ArcaneLibs.Extensions;
@@ -10,5 +11,23 @@ public static class UriExtensions {
         newQuery[name] = value;
         // Console.WriteLine("OriginalString: " + uri.OriginalString);
         return new Uri(location + "?" + newQuery, uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative);
+    }
+    
+    public static Uri EnsureAbsolute(this Uri uri, Uri baseUri) {
+        if (uri.IsAbsoluteUri) {
+            if(baseUri is not null && !uri.OriginalString.StartsWith(baseUri.OriginalString)) {
+                throw new ArgumentException("Uri is not a child of the baseUri");
+            }
+            return uri;
+        }
+        return new Uri(baseUri, uri);
+    }
+    
+    public static string FormatParts(this Uri uri, bool includeQuery = true, bool includeFragment = true) {
+        var sb = new StringBuilder();
+        sb.Append(uri.Scheme).Append("://").Append(uri.Host).Append(uri.AbsolutePath);
+        if (includeQuery && !string.IsNullOrEmpty(uri.Query)) sb.Append(uri.Query);
+        if (includeFragment && !string.IsNullOrEmpty(uri.Fragment)) sb.Append(uri.Fragment);
+        return sb.ToString();
     }
 }

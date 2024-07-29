@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using ArcaneLibs.Extensions;
 
 namespace ArcaneLibs;
 
@@ -175,5 +177,32 @@ public static class Util {
         var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1000)));
         var num = Math.Round(bytes / Math.Pow(1000, place), maxnums);
         return (Math.Sign(byteCount) * num) + " " + suf[place];
+    }
+    
+    public static string ExpandPath(string? path, bool retry = true)
+    {
+        if (path is null) throw new ArgumentNullException(nameof(path));
+        // _logger.LogInformation("Expanding path `{}`", path);
+        Console.WriteLine("Expanding path '{0}'", path);
+
+        if (path.StartsWith('~'))
+        {
+            path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), path[1..]);
+        }
+
+        Environment.GetEnvironmentVariables().Cast<DictionaryEntry>().OrderByDescending(x => x.Key.ToString()!.Length).ToList()
+            .ForEach(x => { path = path.Replace($"${x.Key}", x.Value.ToString()); });
+
+        // _logger.LogInformation("Expanded path to `{}`", path);
+        Console.WriteLine("Expanded path to '{0}'", path);
+        var tries = 0;
+        while (retry && path.ContainsAnyOf("~$".Split()))
+        {
+            if (tries++ > 100)
+                throw new Exception($"Path `{path}` contains unrecognised environment variables");
+            path = ExpandPath(path, false);
+        }
+
+        return path;
     }
 }
