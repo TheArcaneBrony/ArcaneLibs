@@ -62,10 +62,12 @@ public static class StringExtensions {
             }
     }
 
+    private static readonly char[] ArgumentSeparator = [' '];
+
     public static string[] ParseArguments(this string text) =>
         text.Split('"')
             .Select((element, index) => index % 2 == 0 // If even index
-                ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries) // Split the item
+                ? element.Split(ArgumentSeparator, StringSplitOptions.RemoveEmptyEntries) // Split the item
                 : new[] { element }) // Keep the entire item
             .SelectMany(element => element).ToArray();
 
