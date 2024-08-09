@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ArcaneLibs.Extensions;
@@ -7,7 +8,7 @@ public static class HttpExtensions {
     private static readonly string[] SensitiveHttpHeaders = [
         "Authorization"
     ];
-
+    
     public static void ResetSendStatus(this HttpRequestMessage request) {
         typeof(HttpRequestMessage).GetField("_sendStatus", BindingFlags.NonPublic | BindingFlags.Instance)
             ?.SetValue(request, 0);

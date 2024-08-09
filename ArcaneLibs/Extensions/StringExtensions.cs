@@ -34,11 +34,7 @@ public static class StringExtensions {
     public static bool StartsWithAnyOf(this string str, params string[] test) => StartsWithAnyOf(str, test.ToList());
 
     public static string ContentOrEmtpy(this string str) //check empty string if null
-    {
-        if (string.IsNullOrEmpty(str)) return "";
-
-        return str;
-    }
+        => string.IsNullOrEmpty(str) ? string.Empty : str;
 
     public static int CountInstances(this string haystack, string needle) => haystack.Select((_, i) => haystack[i..]).Count(sub => sub.StartsWith(needle));
 

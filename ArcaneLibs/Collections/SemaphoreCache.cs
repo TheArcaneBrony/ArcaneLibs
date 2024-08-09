@@ -45,12 +45,10 @@ public class ExpiringSemaphoreCache<T> where T : class {
         _expiry.TryAdd(key, DateTime.Now + expiry);
         _semaphores[key].Release();
 
-#pragma warning disable CS4014 // We intentionally do not await this task - this handles cache expiry
-        Task.Delay(expiry).ContinueWith(__ => {
-            _values.TryRemove(key, out var _);
-            _semaphores.TryRemove(key, out var _);
+        _ = Task.Delay(expiry).ContinueWith(__ => {
+            _values.TryRemove(key, out _);
+            _semaphores.TryRemove(key, out _);
         });
-#pragma warning restore CS4014
 
         return val;
     }

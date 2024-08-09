@@ -44,11 +44,11 @@ public static class Util {
         }
 
         // If copying subdirectories, copy them and their contents to new location.
-        if (copySubDirs)
-            foreach (var subdir in dirs) {
-                var temppath = Path.Combine(destDirName, subdir.Name);
-                DirectoryCopy(subdir.FullName, temppath, copySubDirs);
-            }
+        if (!copySubDirs) return;
+        foreach (var subdir in dirs) {
+            var temppath = Path.Combine(destDirName, subdir.Name);
+            DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+        }
     }
 
     // public static void DownloadFile(string contextName, string url, string filename, bool overwrite = false, bool extract = false, bool printProgress = true) {
@@ -117,13 +117,13 @@ public static class Util {
         while (!proc.StandardOutput.EndOfStream || !proc.StandardError.EndOfStream) {
             if (!proc.StandardOutput.EndOfStream) {
                 var line = proc.StandardOutput.ReadLine() ?? "";
-                if (stdout) output += line + "\n";
+                if (stdout) output += $"{line}\n";
                 if (!silent) Console.WriteLine(output);
             }
 
             if (!proc.StandardError.EndOfStream) {
                 var line = proc.StandardError.ReadLine() ?? "";
-                if (stderr) output += line + "\n";
+                if (stderr) output += $"{line}\n";
                 if (!silent) Console.WriteLine(output);
             }
         }
@@ -143,7 +143,7 @@ public static class Util {
             WorkingDirectory = path
         };
         var proc = Process.Start(psi);
-        var output = "";
+        var output = string.Empty;
         while (!proc!.StandardOutput.EndOfStream || !proc.StandardError.EndOfStream || !proc.HasExited) {
             if (!proc.StandardOutput.EndOfStream) {
                 var line = await proc.StandardOutput.ReadLineAsync() ?? "";
@@ -159,34 +159,34 @@ public static class Util {
         }
     }
 
+    private static readonly string[] SizeUnits = ["B", "kiB", "MiB", "GiB", "TiB", "PiB", "EiB"];
+
     public static string BytesToString(long byteCount, int maxnums = 2) {
-        string[] suf = ["B", "kiB", "MiB", "GiB", "TiB", "PiB", "EiB"]; //Longs run out around EB
         if (byteCount == 0)
-            return "0 " + suf[0];
+            return $"0 {SizeUnits[0]}";
         var bytes = Math.Abs(byteCount);
         var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
         var num = Math.Round(bytes / Math.Pow(1024, place), maxnums);
-        return (Math.Sign(byteCount) * num) + " " + suf[place];
+        return $"{Math.Sign(byteCount) * num} {SizeUnits[place]}";
     }
 
+    private static readonly string[] SI_SizeUnits = ["B", "kB", "MB", "GB", "TB", "PB", "EB"]; //Longs run out around EB
+
     public static string SI_BytesToString(long byteCount, int maxnums = 2) {
-        string[] suf = ["B", "kB", "MB", "GB", "TB", "PB", "EB"]; //Longs run out around EB
         if (byteCount == 0)
-            return "0 " + suf[0];
+            return $"0 {SI_SizeUnits[0]}";
         var bytes = Math.Abs(byteCount);
         var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1000)));
         var num = Math.Round(bytes / Math.Pow(1000, place), maxnums);
-        return (Math.Sign(byteCount) * num) + " " + suf[place];
+        return $"{Math.Sign(byteCount) * num} {SI_SizeUnits[place]}";
     }
-    
-    public static string ExpandPath(string? path, bool retry = true)
-    {
+
+    public static string ExpandPath(string? path, bool retry = true) {
         if (path is null) throw new ArgumentNullException(nameof(path));
         // _logger.LogInformation("Expanding path `{}`", path);
         Console.WriteLine("Expanding path '{0}'", path);
 
-        if (path.StartsWith('~'))
-        {
+        if (path.StartsWith('~')) {
             path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), path[1..]);
         }
 
@@ -196,8 +196,7 @@ public static class Util {
         // _logger.LogInformation("Expanded path to `{}`", path);
         Console.WriteLine("Expanded path to '{0}'", path);
         var tries = 0;
-        while (retry && path.ContainsAnyOf("~$".Split()))
-        {
+        while (retry && path.ContainsAnyOf("~$".Split())) {
             if (tries++ > 100)
                 throw new Exception($"Path `{path}` contains unrecognised environment variables");
             path = ExpandPath(path, false);
