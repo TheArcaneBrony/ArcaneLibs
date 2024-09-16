@@ -29,7 +29,7 @@ public static class HttpExtensions {
     }
 
     public static string Summarise(this HttpRequestMessage request, bool includeQuery = true, bool includeHeaders = false, bool includeSensitiveHeaders = false,
-        bool includeContentIfText = false) {
+        bool includeContentIfText = false, string[]? hideHeaders = null) {
         if(request.RequestUri == null) throw new NullReferenceException("RequestUri is null");
         var uri = request.RequestUri;
         
@@ -55,6 +55,7 @@ public static class HttpExtensions {
         if (includeHeaders) {
             foreach (var header in request.Headers) {
                 if (!includeSensitiveHeaders && SensitiveHttpHeaders.Contains(header.Key)) continue;
+                if (hideHeaders != null && hideHeaders.Contains(header.Key)) continue;
                 sb.Append($"\n{header.Key}: {string.Join(", ", header.Value)}");
             }
         }
