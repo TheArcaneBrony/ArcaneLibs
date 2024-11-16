@@ -24,7 +24,14 @@ public static class HttpExtensions {
     public static long GetContentLength(this HttpResponseMessage response) {
         if (response.Content == null) return 0;
         if (response.Content.Headers.ContentLength.HasValue) return response.Content.Headers.ContentLength.Value;
-        if (response.Content is StreamContent streamContent) return streamContent.ReadAsStream().Length;
+        if (response.Content is StreamContent streamContent) {
+            try {
+                return streamContent.ReadAsStream().Length;
+            } catch (NotSupportedException) {
+                return -1;
+            }
+        }
+
         return -1;
     }
 
