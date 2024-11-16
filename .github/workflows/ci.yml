@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '9.0.x'
-          dotnet-quality: 'preview'
+          #dotnet-quality: 'preview'
       - name: Discord webhook
         run: |
           curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST --data "{\"content\": \"<:fox_wave_duckmaster:900151686616715306> New commit by $GITHUB_ACTOR: [commit]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA), [run](<$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID?check_suite_focus=true>)\"}" ${{ secrets.DISCORD_WEBHOOK }}
@@ -30,12 +30,12 @@ jobs:
           rm -rf *.nupkg
           export DATE=`date -u '+%Y%m%d.%H%M%S'`
           export REV=`git rev-parse --short HEAD`
-          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs
-          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Logging
-          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Timings
-          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Legacy
-          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.StringNormalisation
-          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Blazor.Components
+          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs
+          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Logging
+          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Timings
+          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Legacy
+          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.StringNormalisation
+          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Blazor.Components
           dotnet nuget push $(ls *.nupkg) -k ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         if: ${{ success() }}
       - name: Publish success
