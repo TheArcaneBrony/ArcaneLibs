@@ -8,6 +8,7 @@ public static class CollectionExtensions {
     }
 
     //return task results async without preserving order
+    [Obsolete("Replaced by Task.WhenEach in .NET 9")]
     public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IEnumerable<Task<T>> tasks, bool skipExceptions = false) {
         var taskList = tasks.ToList();
         while (taskList.Count > 0) {
