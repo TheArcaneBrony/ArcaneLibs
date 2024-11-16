@@ -30,12 +30,12 @@ jobs:
           rm -rf *.nupkg
           export DATE=`date -u '+%Y%m%d.%H%M%S'`
           export REV=`git rev-parse --short HEAD`
-          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs
-          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Logging
-          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Timings
-          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Legacy
-          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.StringNormalisation
-          dotnet pack --nologo --version-suffix preview.$DATE.$REV -o . ArcaneLibs.Blazor.Components
+          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs
+          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Logging
+          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Timings
+          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Legacy
+          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.StringNormalisation
+          dotnet pack --nologo --version-suffix preview.$DATE+$REV -o . ArcaneLibs.Blazor.Components
           dotnet nuget push $(ls *.nupkg) -k ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         if: ${{ success() }}
       - name: Publish success
