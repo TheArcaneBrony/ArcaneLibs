@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs", "ArcaneLibs\Ar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.Logging", "ArcaneLibs.Logging\ArcaneLibs.Logging.csproj", "{6E0A4179-7C2D-4D0A-9122-BFEC36BEC5E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLib.Tests", "ArcaneLib.Tests\ArcaneLib.Tests.csproj", "{1527CC33-7BE0-48A4-BDA4-174B182C2F74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.Tests", "ArcaneLibs.Tests\ArcaneLibs.Tests.csproj", "{1527CC33-7BE0-48A4-BDA4-174B182C2F74}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcaneLibs.UsageTest", "ArcaneLibs.UsageTest\ArcaneLibs.UsageTest.csproj", "{0B313D7F-84CB-40AB-B688-68FA8BD6C2E8}"
 EndProject
