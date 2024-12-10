@@ -1,7 +1,7 @@
 using ArcaneLibs;
 using Xunit;
 
-namespace ArcaneLib.Tests;
+namespace ArcaneLibs.Tests;
 
 public class UnitTest1 {
     [Fact]

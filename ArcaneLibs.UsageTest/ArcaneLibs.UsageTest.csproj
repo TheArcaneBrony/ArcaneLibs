@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ArcaneLib.Tests\ArcaneLib.Tests.csproj"/>
+        <ProjectReference Include="..\ArcaneLibs.Tests\ArcaneLibs.Tests.csproj" />
         <ProjectReference Include="..\ArcaneLibs.Logging\ArcaneLibs.Logging.csproj"/>
     </ItemGroup>
 
