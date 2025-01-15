@@ -48,6 +48,7 @@ public static class ObjectExtensions {
                 var fieldValue = field.GetValue(obj);
                 if (fieldValue == null) continue;
                 var newValue = DeepClone(fieldValue);
+                if (newValue is null) throw new NullReferenceException("DeepClone returned null when input wasn't null!");
                 Console.WriteLine($"{field.Name}: {fieldValue.GetType().Name} -> {newValue.GetType().Name}");
                 field.SetValue(instance, newValue);
             }

@@ -79,7 +79,7 @@ public static class HttpExtensions {
     public static string Summarise(this HttpResponseMessage response, bool includeHeaders = false, bool includeSensitiveHeaders = false, bool includeContentIfText = false, string[]? hideHeaders = null) {
         if(response.RequestMessage == null) throw new NullReferenceException("RequestMessage is null");
         var request = response.RequestMessage;
-        var uri = request.RequestUri;
+        var uri = request.RequestUri ?? throw new NullReferenceException("RequestUri is null");
 
         var sb = new StringBuilder();
 

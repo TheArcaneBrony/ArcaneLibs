@@ -47,7 +47,7 @@ public static class StreamExtensions {
      
         Console.WriteLine($"Blob stream {stream.GetHashCode()}");
         if (revokeAfterFinish) {
-            Task.Run(async () => {
+            _ = Task.Run(async () => {
                 var isDisposed = false;
                 long lastPosition = 0;
                 while (!isDisposed) {

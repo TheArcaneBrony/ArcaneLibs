@@ -190,8 +190,11 @@ public static class Util {
             path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), path[1..]);
         }
 
-        Environment.GetEnvironmentVariables().Cast<DictionaryEntry>().OrderByDescending(x => x.Key.ToString()!.Length).ToList()
-            .ForEach(x => { path = path.Replace($"${x.Key}", x.Value.ToString()); });
+        Environment.GetEnvironmentVariables()
+            .Cast<DictionaryEntry>()
+            .OrderByDescending(x => x.Key.ToString()!.Length)
+            .ToList()
+            .ForEach(x => { path = path.Replace($"${x.Key}", x.Value?.ToString()); });
 
         // _logger.LogInformation("Expanded path to `{}`", path);
         Console.WriteLine("Expanded path to '{0}'", path);

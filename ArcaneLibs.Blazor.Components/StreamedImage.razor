@@ -37,8 +37,6 @@
         }
     }
 
-    protected override async Task OnInitializedAsync() { }
-
     private async Task StreamHasChanged(Stream? stream, CancellationToken? cancellationToken) {
         if (stream is null) return;
         await _importSemaphore.WaitAsync();

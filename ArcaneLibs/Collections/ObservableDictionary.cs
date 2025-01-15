@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ArcaneLibs.Collections;
 
 public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged where TKey : notnull {
-
     public ObservableDictionary() {
         Console.WriteLine("ObservableDictionary created");
     }
-    private Dictionary<TKey, TValue> _dictionary = new();
+
+    private readonly Dictionary<TKey, TValue> _dictionary = new();
 
     public ObservableDictionary(ObservableDictionary<TKey, TValue> value) {
         _dictionary = new Dictionary<TKey, TValue>(value);
@@ -26,7 +27,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
     public void Add(KeyValuePair<TKey, TValue> item) => Add(item.Key, item.Value);
     public bool Contains(KeyValuePair<TKey, TValue> item) => _dictionary.Contains(item);
     public bool ContainsKey(TKey key) => _dictionary.ContainsKey(key);
-    public bool TryGetValue(TKey key, out TValue value) => _dictionary.TryGetValue(key, out value);
+    public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value) => _dictionary.TryGetValue(key, out value);
     public bool Remove(KeyValuePair<TKey, TValue> item) => _dictionary.Remove(item.Key);
 
     void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int index) =>

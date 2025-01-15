@@ -15,7 +15,7 @@
 @code {
 
     [Parameter]
-    public Dictionary<DateTime, double> Data { get; set; }
+    public required Dictionary<DateTime, double> Data { get; set; }
 
     [Parameter]
     public int Width { get; set; } = 100;
@@ -39,11 +39,11 @@
     private Dictionary<double, double> _points = [];
 
     protected override async Task OnParametersSetAsync() {
-        await RebuildGraph();
+        RebuildGraph();
         await base.OnParametersSetAsync();
     }
 
-    private async Task RebuildGraph() {
+    private void RebuildGraph() {
         if (Data.Count == 0) return;
         _points.Clear();
         var startTime = Data.Keys.Min(x => x).Ticks;
