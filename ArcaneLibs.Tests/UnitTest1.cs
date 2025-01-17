@@ -1,4 +1,3 @@
-using ArcaneLibs;
 using Xunit;
 
 namespace ArcaneLibs.Tests;

@@ -1,4 +1,3 @@
-@using ArcaneLibs
 <svg width="@Width" height="@Height">
     @if (Data.Count > 0) {
         <polyline points="@string.Join(" ", _points.Select(x => $"{x.Key},{x.Value}"))" style="fill:none;stroke:black;stroke-width:3"/>

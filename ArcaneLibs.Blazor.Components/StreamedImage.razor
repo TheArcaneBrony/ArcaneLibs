@@ -1,5 +1,6 @@
+@using System.Diagnostics.CodeAnalysis
 @using Microsoft.JSInterop
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 <img src="@_finalBlob" srcref="@(_self)"  @attributes="@(OtherAttributes!)"/> @* @ref="Self" *@
 
 @code {
@@ -26,6 +27,8 @@
     public Dictionary<string, object> OtherAttributes { get; set; } = [];
 
     [Parameter]
+    // ignore warning
+    [SuppressMessage("Usage", "BL0007:Component parameter should be auto-property", Justification = "We need to properly clean up tasks.")]
     public Stream? Stream {
         get => _stream;
         set {
@@ -42,7 +45,7 @@
         await _importSemaphore.WaitAsync();
         if (_streamExtensionsModule is null) {
             Console.WriteLine("Importing StreamedImage JS module");
-            _streamExtensionsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/StreamedImage.razor.js");
+            _streamExtensionsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/StreamedImage.razor.js");
             Console.WriteLine("Successfully imported StreamedImage JS module");
         }
         _importSemaphore.Release();

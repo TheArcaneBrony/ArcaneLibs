@@ -38,7 +38,7 @@ public static class StreamExtensions {
     // }
     
     
-    public static async Task<string> streamImage(this IJSRuntime jsRuntime, Stream stream, ElementReference element, bool revokeAfterFinish = false, int revocationDelay = 1000) {
+    public static async Task<string> StreamImage(this IJSRuntime jsRuntime, Stream stream, ElementReference element, bool revokeAfterFinish = false, int revocationDelay = 1000) {
         if (_streamExtensionsModule is null) {
             Console.WriteLine("Importing stream extensions module");
             _streamExtensionsModule = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/streamExtensions.js");

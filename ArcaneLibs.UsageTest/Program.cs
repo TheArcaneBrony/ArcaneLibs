@@ -1,13 +1,8 @@
-// See https://aka.ms/new-console-template for more information
-
-using System.Diagnostics;
 using System.Drawing;
 using ArcaneLibs;
 using ArcaneLibs.Collections;
-using ArcaneLibs.Extensions;
 using ArcaneLibs.Logging;
 using ArcaneLibs.Logging.LogEndpoints;
-using ArcaneLibs.UsageTest;
 
 Console.WriteLine("Hello, World!");
 //create logs
