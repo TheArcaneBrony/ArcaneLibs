@@ -3,6 +3,8 @@ using ArcaneLibs;
 using ArcaneLibs.Collections;
 using ArcaneLibs.Logging;
 using ArcaneLibs.Logging.LogEndpoints;
+// ReSharper disable CollectionNeverUpdated.Local
+// ReSharper disable UnusedVariable
 
 Console.WriteLine("Hello, World!");
 //create logs

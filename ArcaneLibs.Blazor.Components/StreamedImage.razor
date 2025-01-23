@@ -27,7 +27,6 @@
     public Dictionary<string, object> OtherAttributes { get; set; } = [];
 
     [Parameter]
-    // ignore warning
     [SuppressMessage("Usage", "BL0007:Component parameter should be auto-property", Justification = "We need to properly clean up tasks.")]
     public Stream? Stream {
         get => _stream;

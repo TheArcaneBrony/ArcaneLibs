@@ -3,8 +3,8 @@
         <polyline points="@string.Join(" ", _points.Select(x => $"{x.Key},{x.Value}"))" style="fill:none;stroke:black;stroke-width:3"/>
         @* Y min/max labels *@
         <text>
-            <text x="0" y="@Height" fill="black">@(ValueFormatter.Invoke(_minValue))</text>
-            <text x="0" y="15" fill="black">@(ValueFormatter.Invoke(_maxValue))</text>
+            <text x="0" y="@Height" fill="black">@(ValueFormatter.Invoke(ActualMinValue))</text>
+            <text x="0" y="15" fill="black">@(ValueFormatter.Invoke(ActualMaxValue))</text>
         </text>
         @* outline *@
         <rect x="0" y="0" width="@Width" height="@Height" style="fill:none;stroke:black;stroke-width:1"/>
@@ -32,8 +32,8 @@
     [Parameter]
     public Func<double, string> ValueFormatter { get; set; } = x => x.ToString("X2");
 
-    private double _minValue => MinValue ?? (Data.Count > 0 ? Data.Values.Min() : 0);
-    private double _maxValue => MaxValue ?? (Data.Count > 0 ? Data.Values.Max() : 0);
+    private double ActualMinValue => MinValue ?? (Data.Count > 0 ? Data.Values.Min() : 0);
+    private double ActualMaxValue => MaxValue ?? (Data.Count > 0 ? Data.Values.Max() : 0);
 
     private Dictionary<double, double> _points = [];
 
@@ -47,8 +47,8 @@
         _points.Clear();
         var startTime = Data.Keys.Min(x => x).Ticks;
         var endTime = Data.Keys.Max(x => x).Ticks;
-        var minValue = _minValue;
-        var maxValue = _maxValue;
+        var minValue = ActualMinValue;
+        var maxValue = ActualMaxValue;
         // Console.WriteLine($"Start: {startTime}, End: {endTime}, Min: {minValue}, Max: {maxValue}");
         foreach (var item in Data) {
             _points.Add(Map(item.Key.Ticks, startTime, endTime, 0, Width),

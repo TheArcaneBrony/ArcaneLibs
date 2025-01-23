@@ -7,7 +7,7 @@ public static class HttpExtensions {
     private static readonly string[] SensitiveHttpHeaders = [
         "Authorization"
     ];
-    
+
     public static void ResetSendStatus(this HttpRequestMessage request) {
         typeof(HttpRequestMessage).GetField("_sendStatus", BindingFlags.NonPublic | BindingFlags.Instance)
             ?.SetValue(request, 0);
@@ -21,12 +21,14 @@ public static class HttpExtensions {
     }
 
     public static long GetContentLength(this HttpResponseMessage response) {
-        if (response.Content == null) return 0;
+        // TODO: what does No Content mean for Content's value?
+        // if (response.Content == null) return 0;
         if (response.Content.Headers.ContentLength.HasValue) return response.Content.Headers.ContentLength.Value;
         if (response.Content is StreamContent streamContent) {
             try {
                 return streamContent.ReadAsStream().Length;
-            } catch (NotSupportedException) {
+            }
+            catch (NotSupportedException) {
                 return -1;
             }
         }
@@ -36,9 +38,9 @@ public static class HttpExtensions {
 
     public static string Summarise(this HttpRequestMessage request, bool includeQuery = true, bool includeHeaders = false, bool includeSensitiveHeaders = false,
         bool includeContentIfText = false, string[]? hideHeaders = null) {
-        if(request.RequestUri == null) throw new NullReferenceException("RequestUri is null");
+        if (request.RequestUri == null) throw new NullReferenceException("RequestUri is null");
         var uri = request.RequestUri;
-        
+
         var sb = new StringBuilder();
 
         // "HttpRequest<StreamContent>(123456): "
@@ -75,8 +77,9 @@ public static class HttpExtensions {
         return sb.ToString();
     }
 
-    public static string Summarise(this HttpResponseMessage response, bool includeHeaders = false, bool includeSensitiveHeaders = false, bool includeContentIfText = false, string[]? hideHeaders = null) {
-        if(response.RequestMessage == null) throw new NullReferenceException("RequestMessage is null");
+    public static string Summarise(this HttpResponseMessage response, bool includeHeaders = false, bool includeSensitiveHeaders = false, bool includeContentIfText = false,
+        string[]? hideHeaders = null) {
+        if (response.RequestMessage == null) throw new NullReferenceException("RequestMessage is null");
         var request = response.RequestMessage;
         var uri = request.RequestUri ?? throw new NullReferenceException("RequestUri is null");
 
@@ -84,7 +87,9 @@ public static class HttpExtensions {
 
         // "HttpResponse<StreamContent>(123456): "
         sb.Append("HttpResponse");
-        if (response.Content is not null) sb.Append($"<{response.Content.GetType()}>");
+        // TODO: what does No Content mean for Content's value?
+        // if (response.Content is not null)
+        sb.Append($"<{response.Content.GetType()}>");
         sb.Append($"({response.GetHashCode()})");
         sb.Append(": ");
 
@@ -93,14 +98,15 @@ public static class HttpExtensions {
         if (!string.IsNullOrEmpty(request.RequestUri.Query)) sb.Append(request.RequestUri.Query);
 
         // "(123 B)"
-        if (response.Content != null) {
+        // TODO: what does No Content mean for Content's value?
+        // if (response.Content != null) {
             var contentLength = response.GetContentLength();
             if (contentLength > 0) sb.Append($" ({Util.BytesToString(contentLength)})");
             else sb.Append(" (stream)");
-        }
+        // }
 
         // "200 OK"
-        sb.Append($" {(int) response.StatusCode} {response.ReasonPhrase}");
+        sb.Append($" {(int)response.StatusCode} {response.ReasonPhrase}");
 
         // "Content-Type: application/json"
         if (includeHeaders) {
@@ -112,7 +118,8 @@ public static class HttpExtensions {
         }
 
         // "<data>"
-        if (includeContentIfText && response.Content != null) {
+        // TODO: what does No Content mean for Content's value?
+        if (includeContentIfText) {
             var content = response.Content.ReadAsStringAsync().Result;
             if (!string.IsNullOrEmpty(content)) sb.Append($"\n{content}");
         }
