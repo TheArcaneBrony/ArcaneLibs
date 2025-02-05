@@ -13,7 +13,7 @@ export async function streamImage(stream, srcRef) {
         if (chunks.length <= 10 || chunks.length % 10 === 0 || done) {
             //srcRef attribute on img tag
             let imageElement = document.querySelector(`img[srcref="${srcRef}"]`);
-            console.log('meow', srcRef, imageElement);
+            console.debug('meow', srcRef, imageElement);
             // console.log(`StreamedImage: streamImage done: ${done}, value: ${value?.length}, chunks: ${chunks.length}`);
             let blob = new Blob(chunks);
             const url = window.URL.createObjectURL(blob);

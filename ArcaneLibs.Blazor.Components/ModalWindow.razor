@@ -1,10 +1,12 @@
-<div class="r-modal" style="top: @(_y)px; left: @(_x)px;">
-    <div class="titlebar" @onmousedown="MouseDown" @onmouseup="MouseUp" @onmousemove="MouseMove" @onmouseleave="MouseMove">
-        <b class="title" @ref="_titleRef">@Title</b>
+<div class="r-modal" style="top: @(_y)px; left: @(_x)px;" draggable="@_isDraggable.ToString()" @ondragstart="@OnDragStart" @ondragend="OnDragEnd">
+    <div class="titlebar">
+        <b class="title">@Title</b>
         <button class="btnclose" @onclick="OnCloseClicked">X</button>
         <button class="btncollapse" @onclick="@(() => Collapsed = !Collapsed)">_</button>
     </div>
-    <div class="r-modal-content" style="@((Collapsed ? "height: 0px;" : "") + $"min-width: {MinWidth}px;")">
+    <div class="r-modal-content" style="@((Collapsed ? "height: 0px;" : "") + $"min-width: {MinWidth}px;")"
+         draggable="@_isDraggable.ToString()" ondragstart="event.preventDefault(); event.stopPropagation();"
+         @onmouseenter="OnChildEnter" @onmouseleave="OnChildLeave">
         @ChildContent
     </div>
 </div>
@@ -32,8 +34,6 @@
     [Parameter]
     public bool Collapsed { get; set; }
 
-    private ElementReference _titleRef;
-
     private double _x = 60;
     private double _y = 60;
 
@@ -43,27 +43,36 @@
         await base.OnInitializedAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) => await base.OnAfterRenderAsync(firstRender);
-
     private bool _isDragging;
+    private bool _isDraggable = true;
     private double _dragX;
     private double _dragY;
-    
-    private void MouseDown(MouseEventArgs obj) {
+
+    private void OnDragStart(MouseEventArgs obj) {
         _isDragging = true;
-        _dragX = obj.ClientX;
-        _dragY = obj.ClientY;
+        _dragX = obj.ClientX - _x;
+        _dragY = obj.ClientY - _y;
+        Task.Run(async () => {
+            await Task.Yield();
+            _x = _y = short.MaxValue;
+            StateHasChanged();
+        });
     }
 
-    private void MouseUp(MouseEventArgs obj) => _isDragging = false;
-    
-    private void MouseMove(MouseEventArgs obj) {
-        if (!_isDragging) return;
+    private void OnDragEnd(MouseEventArgs obj) {
+        _x = Math.Max(0, obj.ClientX - _dragX);
+        _y = Math.Max(0, obj.ClientY - _dragY);
+        StateHasChanged();
+        _isDragging = false;
+    }
 
-        _x += obj.ClientX - _dragX;
-        _y += obj.ClientY - _dragY;
-        _dragX = obj.ClientX;
-        _dragY = obj.ClientY;
+    private void OnChildEnter() {
+        if (!_isDragging) _isDraggable = false;
+        StateHasChanged();
+    }
+
+    private void OnChildLeave() {
+        _isDraggable = true;
         StateHasChanged();
     }
 
