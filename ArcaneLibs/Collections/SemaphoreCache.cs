@@ -24,6 +24,15 @@ public class SemaphoreCache<T> where T : class {
             _semaphores[key].Release();
         }
     }
+    
+    public async Task<T?> TryGetOrAdd(string key, Func<Task<T>> factory) {
+        try {
+            return await GetOrAdd(key, factory);
+        }
+        catch {
+            return null;
+        }
+    }
 }
 
 public class ExpiringSemaphoreCache<T> where T : class {
