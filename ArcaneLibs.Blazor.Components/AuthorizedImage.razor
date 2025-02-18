@@ -1,0 +1,64 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JsRuntime
+<img src="@FinalBlob" @ref="_self" @attributes="@(OtherAttributes!)"/> @*  *@
+
+@* ReSharper disable once InconsistentNaming *@
+
+@code {
+    private static IJSObjectReference? _streamExtensionsModule;
+    private static readonly Lock ImportSemaphore = new();
+    private static readonly SemaphoreSlim ExecuteSemaphore = new(4, 4);
+
+    public string? FinalBlob { private get; [JSInvokable] set; }
+    private CancellationTokenSource _cts = new();
+
+    [Parameter]
+    public required string src {
+        get;
+        set {
+            if (field == value) return;
+            field = value;
+            FinalBlob = null;
+        }
+    }
+
+    [Parameter]
+    public required string AccessToken { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> OtherAttributes { get; set; } = [];
+
+    private ElementReference _self;
+
+    protected override async Task OnInitializedAsync() {
+        ImportSemaphore.Enter();
+        if (_streamExtensionsModule is null) {
+            Console.WriteLine("Importing AuthorizedImage JS module");
+            _streamExtensionsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/AuthorizedImage.razor.js");
+            Console.WriteLine("Successfully imported AuthorizedImage JS module");
+        }
+
+        ImportSemaphore.Exit();
+    }
+
+    protected override bool ShouldRender() => !string.IsNullOrWhiteSpace(src) && !string.IsNullOrWhiteSpace(AccessToken);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        // if (!firstRender) return;
+        if (!string.IsNullOrWhiteSpace(FinalBlob)) return;
+        if (string.IsNullOrWhiteSpace(src) || string.IsNullOrWhiteSpace(AccessToken)) return;
+        if (string.IsNullOrWhiteSpace(_self.Id)) return;
+
+        await ExecuteSemaphore.WaitAsync();
+        FinalBlob = await _streamExtensionsModule!.InvokeAsync<string?>("streamImageFromUrl", src, AccessToken, _self);
+        if (FinalBlob is null) {
+            FinalBlob = null;
+            src += "#";
+        }
+            
+        StateHasChanged();
+        await Task.Yield();
+        ExecuteSemaphore.Release();
+    }
+
+}
