@@ -6,11 +6,11 @@ using System.Diagnostics.CodeAnalysis;
 namespace ArcaneLibs.Collections;
 
 public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged where TKey : notnull {
-    public ObservableDictionary() {
-        Console.WriteLine("ObservableDictionary created");
-    }
-
     private readonly Dictionary<TKey, TValue> _dictionary = new();
+
+    public ObservableDictionary() {
+        _dictionary = [];
+    }
 
     public ObservableDictionary(ObservableDictionary<TKey, TValue> value) {
         _dictionary = new Dictionary<TKey, TValue>(value);
@@ -65,7 +65,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
             return _dictionary[key];
         }
         set {
-            Console.WriteLine($"Setting value {key} -> {value} --- {ContainsKey(key)}");
+            // Console.WriteLine($"Setting value {key} -> {value} --- {ContainsKey(key)}");
             if (ContainsKey(key)) {
                 var oldValue = _dictionary[key];
                 _dictionary[key] = value;
