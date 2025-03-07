@@ -3,3 +3,8 @@
     height: 1.4em;
     display: inline-block;
 }
+
+.fancy-textbox-inline-multiline {
+    border-bottom: #ccc solid 1px;
+    display: inline-block;
+}

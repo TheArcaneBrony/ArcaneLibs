@@ -1,10 +1,22 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime
 @if (_isVisible) {
-    <input autofocus type="@(IsPassword ? "password" : "text")" @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"/>
+    @if(Multiline) {
+        <textarea autofocus @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"></textarea>
+    }
+    else {
+        <input autofocus type="@(IsPassword ? "password" : "text")" @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"/>
+    }
+    @* <input autofocus type="@(IsPassword ? "password" : "text")" @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"/> *@
 }
 else {
-    <span class="fancy-textbox-inline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true">@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</span>
+    @*  *@
+    @if (Multiline && !string.IsNullOrWhiteSpace(Value)) {
+        <span class="fancy-textbox-inline-multiline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true"><pre>@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</pre></span>
+    }
+    else {
+        <span class="fancy-textbox-inline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true">@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</span>
+    }
 }
 
 @code {
@@ -13,7 +25,10 @@ else {
     public string? Value { get; set; }
 
     [Parameter]
-    public bool IsPassword { get; set; } = false;
+    public bool IsPassword { get; set; }
+
+    [Parameter]
+    public bool Multiline { get; set; }
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }

@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace ArcaneLibs.Collections;
 
-public class SemaphoreCache<T> {
+public class SemaphoreCache<T> where T : class {
     private readonly ConcurrentDictionary<string, T> _values = new();
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _semaphores = new();
     public bool StoreNulls { get; set; } = false;
@@ -25,7 +25,7 @@ public class SemaphoreCache<T> {
             _semaphores[key].Release();
         }
     }
-    
+
     public async Task<T?> TryGetOrAdd(string key, Func<Task<T>> factory) {
         try {
             return await GetOrAdd(key, factory);
@@ -36,7 +36,7 @@ public class SemaphoreCache<T> {
     }
 }
 
-public class ExpiringSemaphoreCache<T> {
+public class ExpiringSemaphoreCache<T> where T : class {
     private readonly ConcurrentDictionary<string, T> _values = new();
     private readonly ConcurrentDictionary<string, SemaphoreSlim> _semaphores = new();
     private readonly ConcurrentDictionary<string, DateTime> _expiry = new();
