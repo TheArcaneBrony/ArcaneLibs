@@ -14,34 +14,37 @@ public static class CollectionExtensions {
         while (taskList.Count > 0) {
             var task = await Task.WhenAny(taskList);
             taskList.Remove(task);
-            if(skipExceptions && task.IsFaulted) continue; 
+            if (skipExceptions && task.IsFaulted) continue;
             yield return await task;
         }
     }
-    
+
     public static int GetWidth<T>(this T[,] array) => array.GetLength(1);
     public static int GetHeight<T>(this T[,] array) => array.GetLength(0);
-    
+
     public static void MergeBy<T>(this List<T> list, IEnumerable<T> other, Func<T, T, bool> predicate, Action<T, T> mergeAction) {
         foreach (var item in other) {
             var existing = list.FirstOrDefault(x => predicate(x, item));
             if (existing is not null) {
                 mergeAction(existing, item);
-            } else {
+            }
+            else {
                 list.Add(item);
             }
         }
     }
-    
+
     public static void ReplaceBy<T>(this List<T> list, IEnumerable<T> other, Func<T, T, bool> predicate) {
-        foreach (var item in other) {
-            var existing = list.FirstOrDefault(x => predicate(x, item));
-            if (existing is not null) {
-                var index = list.IndexOf(existing);
-                list[index] = item;
-            } else {
-                list.Add(item);
+        var otherList = other.ToList();
+        var newList = list.Select(x=> {
+            var newValue = otherList.FirstOrDefault(y => predicate(x, y));
+            if (newValue is not null) {
+                otherList.Remove(newValue);
+                return newValue;
             }
-        }
+            return x;
+        }).ToList();
+        list.Clear();
+        list.AddRange(newList);
     }
 }
