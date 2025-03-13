@@ -15,12 +15,23 @@ public static class ObjectExtensions {
     public static string ToJson(this object? obj, bool indent = true, bool ignoreNull = false, bool unsafeContent = false) {
         if (obj is null) return "";
         var cacheKey = (byte)((indent ? 1 : 0) | (ignoreNull ? 2 : 0) | (unsafeContent ? 4 : 0));
-        var options = OptionsCache.GetOrCreate(cacheKey , _ => new JsonSerializerOptions {
+        var options = OptionsCache.GetOrCreate(cacheKey, _ => new JsonSerializerOptions {
             WriteIndented = indent,
             DefaultIgnoreCondition = ignoreNull ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never,
             Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null
         });
         return JsonSerializer.Serialize(obj, obj.GetType(), options);
+    }
+
+    public static byte[] ToJsonUtf8Bytes(this object? obj, bool indent = true, bool ignoreNull = false, bool unsafeContent = false) {
+        if (obj is null) return [];
+        var cacheKey = (byte)((indent ? 1 : 0) | (ignoreNull ? 2 : 0) | (unsafeContent ? 4 : 0));
+        var options = OptionsCache.GetOrCreate(cacheKey, _ => new JsonSerializerOptions {
+            WriteIndented = indent,
+            DefaultIgnoreCondition = ignoreNull ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never,
+            Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null
+        });
+        return JsonSerializer.SerializeToUtf8Bytes(obj, obj.GetType(), options);
     }
 
     public static T? DeepClone<T>(this T? obj) where T : class {
