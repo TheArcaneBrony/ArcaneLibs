@@ -35,16 +35,14 @@ public static class CollectionExtensions {
     }
 
     public static void ReplaceBy<T>(this List<T> list, IEnumerable<T> other, Func<T, T, bool> predicate) {
-        var otherList = other.ToList();
-        var newList = list.Select(x=> {
-            var newValue = otherList.FirstOrDefault(y => predicate(x, y));
-            if (newValue is not null) {
-                otherList.Remove(newValue);
-                return newValue;
+        foreach (var item in other) {
+            var existing = list.FindIndex(x => predicate(x, item));
+            if (existing != -1) {
+                list[existing] = item;
             }
-            return x;
-        }).ToList();
-        list.Clear();
-        list.AddRange(newList);
+            else {
+                list.Add(item);
+            }
+        }
     }
 }
