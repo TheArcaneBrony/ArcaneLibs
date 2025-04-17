@@ -1,13 +1,17 @@
-<a href="@href" class="btn btn-primary" @onclick="Callback"
+<a href="@href" target="@target" class="btn btn-primary" @onclick="Callback"
    style="background-color: @(Color ?? "#1b6ec2"); @(Round ? "border-radius: 25px;" : "")">
     @ChildContent
 </a>
 
 @* ReSharper disable once InconsistentNaming *@
+
 @code {
 
     [Parameter]
     public string? href { get; set; }
+
+    [Parameter]
+    public string? target { get; set; }
 
     [Parameter]
     public required RenderFragment? ChildContent { get; set; }
