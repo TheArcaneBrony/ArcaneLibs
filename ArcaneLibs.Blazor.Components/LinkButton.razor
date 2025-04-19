@@ -1,4 +1,4 @@
-<a href="@href" target="@target" class="btn btn-primary" @onclick="Callback"
+<a role="@(OnClick is null ? "link" : "button")" href="@href" target="@target" class="btn btn-primary" @onclick="Callback"
    style="background-color: @(Color ?? "#1b6ec2"); @(Round ? "border-radius: 25px;" : "")">
     @ChildContent
 </a>
