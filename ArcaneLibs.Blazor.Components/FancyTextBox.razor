@@ -12,10 +12,10 @@
 else {
     @*  *@
     @if (Multiline && !string.IsNullOrWhiteSpace(Value)) {
-        <span class="fancy-textbox-inline-multiline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true"><pre>@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</pre></span>
+        <span role="textbox" class="fancy-textbox-inline-multiline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true"><pre>@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</pre></span>
     }
     else {
-        <span class="fancy-textbox-inline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true">@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</span>
+        <span role="textbox" class="fancy-textbox-inline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true">@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</span>
     }
 }
 
