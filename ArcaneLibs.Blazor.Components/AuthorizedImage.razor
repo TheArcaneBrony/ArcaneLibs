@@ -1,5 +1,7 @@
+@using Microsoft.Extensions.Logging
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime
+@inject ILogger<AuthorizedImage> Logger
 <img src="@FinalBlob" @ref="_self" @attributes="@(OtherAttributes!)"/> @*  *@
 
 @* ReSharper disable once InconsistentNaming *@
@@ -7,6 +9,7 @@
 @code {
     private static IJSObjectReference? _streamExtensionsModule;
     private static readonly Lock ImportSemaphore = new();
+    private static LogLevel _logLevel = LogLevel.Information;
     private static readonly SemaphoreSlim ExecuteSemaphore = new(4, 4);
 
     public string? FinalBlob { private get; [JSInvokable] set; }
@@ -30,17 +33,6 @@
 
     private ElementReference _self;
 
-    protected override async Task OnInitializedAsync() {
-        ImportSemaphore.Enter();
-        if (_streamExtensionsModule is null) {
-            Console.WriteLine("Importing AuthorizedImage JS module");
-            _streamExtensionsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/AuthorizedImage.razor.js");
-            Console.WriteLine("Successfully imported AuthorizedImage JS module");
-        }
-
-        ImportSemaphore.Exit();
-    }
-
     protected override bool ShouldRender() => !string.IsNullOrWhiteSpace(src) && !string.IsNullOrWhiteSpace(AccessToken);
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
@@ -48,9 +40,19 @@
         if (!string.IsNullOrWhiteSpace(FinalBlob)) return;
         if (string.IsNullOrWhiteSpace(src) || string.IsNullOrWhiteSpace(AccessToken)) return;
         if (string.IsNullOrWhiteSpace(_self.Id)) return;
+        
+        
+        ImportSemaphore.Enter();
+        if (_streamExtensionsModule is null) {
+            Logger.LogInformation("Importing AuthorizedImage JS module");
+            _streamExtensionsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/AuthorizedImage.razor.js");
+            Logger.LogInformation("Successfully imported AuthorizedImage JS module");
+        }
+        _logLevel = GetLogLevel(Logger);
+        ImportSemaphore.Exit();
 
         await ExecuteSemaphore.WaitAsync();
-        FinalBlob = await _streamExtensionsModule!.InvokeAsync<string?>("streamImageFromUrl", src, AccessToken, _self);
+        FinalBlob = await _streamExtensionsModule.InvokeAsync<string?>("streamImageFromUrl", src, AccessToken, _self, GetLogLevel(Logger));
         if (FinalBlob is null) {
             FinalBlob = null;
             src += "#";
@@ -59,6 +61,16 @@
         StateHasChanged();
         await Task.Yield();
         ExecuteSemaphore.Release();
+    }
+    
+    private static LogLevel GetLogLevel(ILogger logger) {
+        if (logger.IsEnabled(LogLevel.Trace)) return LogLevel.Trace;
+        if (logger.IsEnabled(LogLevel.Debug)) return LogLevel.Debug;
+        if (logger.IsEnabled(LogLevel.Information)) return LogLevel.Information;
+        if (logger.IsEnabled(LogLevel.Warning)) return LogLevel.Warning;
+        if (logger.IsEnabled(LogLevel.Error)) return LogLevel.Error;
+        if (logger.IsEnabled(LogLevel.Critical)) return LogLevel.Critical;
+        return LogLevel.None;
     }
 
 }

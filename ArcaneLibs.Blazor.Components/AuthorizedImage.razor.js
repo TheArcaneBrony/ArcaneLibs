@@ -42,7 +42,18 @@
 //     }
 // }
 
-export async function streamImageFromUrl(url, accessToken, imageElement) {
+// dotnet log levels
+const logLevels = {
+    Trace: 0,
+    Debug: 1,
+    Information: 2,
+    Warning: 3,
+    Error: 4,
+    Critical: 5,
+    None: 6,
+}
+
+export async function streamImageFromUrl(url, accessToken, imageElement, logLevel) {
     // console.log("streamImageFromUrl start from", url, "for", imageElement);
     if(imageElement === null) {
         console.error("streamImageFromUrl: imageElement is null");
@@ -71,7 +82,8 @@ export async function streamImageFromUrl(url, accessToken, imageElement) {
             // console.log(`StreamedImage: streamImageFromUrl src: ${blobUri} - done: ${done}`)
 
             if (done) {
-                console.debug(`AuthorizedImage.razor.js: streamImageFromUrl finished in ${chunks.length} chunks: ${url} -> ${blobUri}`);
+                if (logLevel <= logLevels.Debug)
+                    console.debug(`AuthorizedImage.razor.js: streamImageFromUrl finished in ${chunks.length} chunks: ${url} -> ${blobUri}`);
                 return blobUri;
             } else {
                 // Dispose old URLs to avoid memory leaks
