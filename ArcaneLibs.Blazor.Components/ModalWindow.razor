@@ -1,4 +1,4 @@
-<div class="r-modal" style="top: @(_y)px; left: @(_x)px;" draggable="@_isDraggable.ToString()" @ondragstart="@OnDragStart" @ondragend="OnDragEnd">
+<div class="r-modal" role="dialog" style="top: @(_y)px; left: @(_x)px;" draggable="@_isDraggable.ToString()" @ondragstart="@OnDragStart" @ondragend="OnDragEnd">
     <div class="titlebar">
         <b class="title">@Title</b>
         <button class="btnclose" @onclick="OnCloseClicked">X</button>
