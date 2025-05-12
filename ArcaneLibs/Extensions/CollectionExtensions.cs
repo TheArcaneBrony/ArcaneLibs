@@ -45,4 +45,8 @@ public static class CollectionExtensions {
             }
         }
     }
+
+    public static bool ContainsAll<T>(this IEnumerable<T> list, IEnumerable<T> other) {
+        return !other.Except(list).Any();
+    }
 }

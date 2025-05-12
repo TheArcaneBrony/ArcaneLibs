@@ -15,4 +15,15 @@ public static class FileUtils {
         var uri = new Uri(assembly!.Location);
         return Path.GetDirectoryName(uri.LocalPath)!;
     }
+
+    public static IEnumerable<FileSystemInfo> EnumerateDirectory(string path) {
+        var contents = Directory.GetFileSystemEntries(path);
+        foreach (var entry in contents) {
+            if (File.Exists(entry)) {
+                yield return new FileInfo(entry);
+            } else if (Directory.Exists(entry)) {
+                yield return new DirectoryInfo(entry);
+            }
+        }
+    }
 }
