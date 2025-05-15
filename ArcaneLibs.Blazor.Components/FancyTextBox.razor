@@ -1,5 +1,6 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JsRuntime
+@rendermode RenderMode.InteractiveWebAssembly
 @if (_isVisible) {
     @if(Multiline) {
         <textarea autofocus @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"></textarea>
@@ -39,13 +40,19 @@ else {
     private bool _isVisible = false;
 
     private ElementReference? _elementToFocus;
+    private static IJSObjectReference? _module;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) => await JsRuntime.InvokeVoidAsync("BlazorFocusElement", _elementToFocus);
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (!firstRender) return;
+        _module ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/FancyTextBox.js");
+        await _module.InvokeVoidAsync("BlazorFocusElement", _elementToFocus);
+    }
 
     [Parameter]
     public string ForegroundColor { get; set; } = "#ffffffff";
 
     [Parameter]
     public string BackgroundColor { get; set; } = "#00000000";
+
 
 }
