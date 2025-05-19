@@ -1,22 +1,21 @@
-@using Microsoft.JSInterop
-@inject IJSRuntime JsRuntime
-@rendermode RenderMode.InteractiveWebAssembly
 @if (_isVisible) {
-    @if(Multiline) {
-        <textarea autofocus @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"></textarea>
+    @if (Multiline) {
+        <textarea autofocus @bind="Value" @onfocusout="@OnFocusOut" @ref="_elementToFocus"></textarea>
     }
     else {
-        <input autofocus type="@(IsPassword ? "password" : "text")" @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"/>
+        <input autofocus @bind="Value" @onfocusout="@OnFocusOut" @ref="_elementToFocus" type="@(IsPassword ? "password" : "text")"/>
     }
-    @* <input autofocus type="@(IsPassword ? "password" : "text")" @bind="Value" @onfocusout="() => { _isVisible = false; ValueChanged.InvokeAsync(Value); }" @ref="_elementToFocus"/> *@
 }
 else {
-    @*  *@
     @if (Multiline && !string.IsNullOrWhiteSpace(Value)) {
-        <span role="textbox" class="fancy-textbox-inline-multiline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true"><pre>@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</pre></span>
+        <span role="textbox" class="fancy-textbox-inline-multiline" tabindex="0"
+              style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor"
+              @onfocusin="@OnFocusIn"><pre>@FormattedValue</pre></span>
     }
     else {
-        <span role="textbox" class="fancy-textbox-inline" tabindex="0" style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor" @onfocusin="() => _isVisible = true">@(Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value))</span>
+        <span role="textbox" class="fancy-textbox-inline" tabindex="0"
+              style="@(string.IsNullOrEmpty(Value) ? "min-width: 50px;" : "") background-color: @BackgroundColor; color: @ForegroundColor"
+              @onfocusin="@OnFocusIn">@FormattedValue</span>
     }
 }
 
@@ -35,18 +34,7 @@ else {
     public EventCallback<string> ValueChanged { get; set; }
 
     [Parameter]
-    public Func<string?, string>? Formatter { get; set; }
-
-    private bool _isVisible = false;
-
-    private ElementReference? _elementToFocus;
-    private static IJSObjectReference? _module;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-        if (!firstRender) return;
-        _module ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/ArcaneLibs.Blazor.Components/FancyTextBox.js");
-        await _module.InvokeVoidAsync("BlazorFocusElement", _elementToFocus);
-    }
+    public Func<string?, string?>? Formatter { get; set; }
 
     [Parameter]
     public string ForegroundColor { get; set; } = "#ffffffff";
@@ -54,5 +42,29 @@ else {
     [Parameter]
     public string BackgroundColor { get; set; } = "#00000000";
 
+    private string? FormattedValue => Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value);
+
+    private ElementReference? _elementToFocus;
+
+    private bool _isVisible = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (!_isVisible) return;
+        if (_elementToFocus is null) return;
+        await _elementToFocus.Value.FocusAsync();
+    }
+
+    private string? _oldValue;
+
+    private void OnFocusOut() {
+        _isVisible = false;
+        if (Value != _oldValue)
+            ValueChanged.InvokeAsync(Value);
+    }
+
+    private void OnFocusIn() {
+        _isVisible = true;
+        _oldValue = Value;
+    }
 
 }
