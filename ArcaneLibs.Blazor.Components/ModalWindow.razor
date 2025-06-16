@@ -1,12 +1,12 @@
 <div class="r-modal" role="dialog" style="top: @(_y)px; left: @(_x)px;" draggable="@_isDraggable.ToString()" @ondragstart="@OnDragStart" @ondragend="OnDragEnd">
     <div class="titlebar">
         <b class="title">@Title</b>
-        <button class="btnclose" @onclick="OnCloseClicked">X</button>
+        <button class="btnclose" @onclick="@InvokeOnClose">X</button>
         <button class="btncollapse" @onclick="@(() => Collapsed = !Collapsed)">_</button>
     </div>
     <div class="r-modal-content" style="@((Collapsed ? "height: 0px;" : "") + $"min-width: {MinWidth}px;")"
          draggable="@_isDraggable.ToString()" ondragstart="event.preventDefault(); event.stopPropagation();"
-         @onmouseenter="OnChildEnter" @onmouseleave="OnChildLeave">
+         @onmouseenter="@OnChildEnter" @onmouseleave="@OnChildLeave">
         @ChildContent
     </div>
 </div>
@@ -29,7 +29,18 @@
     public double MinWidth { get; set; } = 100;
 
     [Parameter]
-    public required Action OnCloseClicked { get; set; }
+    public Action? OnCloseClicked { get; set; }
+
+    [Parameter]
+    public Func<Task>? OnCloseClickedAsync { get; set; }
+
+    private async Task InvokeOnClose() {
+        if (OnCloseClicked is not null)
+            OnCloseClicked.Invoke();
+
+        if (OnCloseClickedAsync is not null)
+            await OnCloseClickedAsync.Invoke();
+    }
 
     [Parameter]
     public bool Collapsed { get; set; }
