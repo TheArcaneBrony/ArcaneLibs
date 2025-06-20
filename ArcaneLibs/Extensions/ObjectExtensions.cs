@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace ArcaneLibs.Extensions;
@@ -32,6 +33,17 @@ public static class ObjectExtensions {
             Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null
         });
         return JsonSerializer.SerializeToUtf8Bytes(obj, obj.GetType(), options);
+    }
+    
+    public static JsonNode ToJsonNode(this object? obj, bool ignoreNull = false, bool unsafeContent = false) {
+        if (obj is null) return "";
+        var cacheKey = (byte)((ignoreNull ? 2 : 0) | (unsafeContent ? 4 : 0));
+        var options = OptionsCache.GetOrCreate(cacheKey, _ => new JsonSerializerOptions {
+            DefaultIgnoreCondition = ignoreNull ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never,
+            Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null
+        });
+        var serialized = JsonSerializer.Serialize(obj, obj.GetType(), options);
+        return JsonNode.Parse(serialized) ?? throw new InvalidOperationException("Failed to parse JSON node from object.");
     }
 
     public static T? DeepClone<T>(this T? obj) where T : class {
