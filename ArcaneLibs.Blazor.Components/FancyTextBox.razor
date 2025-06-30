@@ -1,4 +1,10 @@
-@if (_isVisible) {
+@{
+    string valueToDisplay = string.IsNullOrWhiteSpace(FormattedValue)
+        ? PlaceholderText ?? "Click to edit"
+        : FormattedValue;
+    bool isPlaceholder = string.IsNullOrWhiteSpace(FormattedValue) && !string.IsNullOrWhiteSpace(PlaceholderText);
+}
+@if (IsEditing) {
     @if (Multiline) {
         <textarea autofocus @bind="Value" @onfocusout="@OnFocusOut" @ref="_elementToFocus"></textarea>
     }
@@ -42,14 +48,17 @@ else {
     [Parameter]
     public string BackgroundColor { get; set; } = "#00000000";
 
+    [Parameter]
+    public string? PlaceholderText { get; set; }
+
     private string? FormattedValue => Formatter?.Invoke(Value) ?? (IsPassword && Value is not null ? string.Join("", Value.Select(_ => '*')) : Value);
 
     private ElementReference? _elementToFocus;
 
-    private bool _isVisible = false;
+    private bool IsEditing { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
-        if (!_isVisible) return;
+        if (!IsEditing) return;
         if (_elementToFocus is null) return;
         await _elementToFocus.Value.FocusAsync();
     }
@@ -57,13 +66,13 @@ else {
     private string? _oldValue;
 
     private void OnFocusOut() {
-        _isVisible = false;
+        IsEditing = false;
         if (Value != _oldValue)
             ValueChanged.InvokeAsync(Value);
     }
 
     private void OnFocusIn() {
-        _isVisible = true;
+        IsEditing = true;
         _oldValue = Value;
     }
 
