@@ -1,9 +1,3 @@
-@{
-    string valueToDisplay = string.IsNullOrWhiteSpace(FormattedValue)
-        ? PlaceholderText ?? "Click to edit"
-        : FormattedValue;
-    bool isPlaceholder = string.IsNullOrWhiteSpace(FormattedValue) && !string.IsNullOrWhiteSpace(PlaceholderText);
-}
 @if (IsEditing) {
     @if (Multiline) {
         <textarea autofocus @bind="Value" @onfocusout="@OnFocusOut" @ref="_elementToFocus"></textarea>
