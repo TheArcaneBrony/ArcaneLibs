@@ -16,8 +16,15 @@ public static class HttpExtensions {
     public static long GetContentLength(this HttpRequestMessage request) {
         if (request.Content == null) return 0;
         if (request.Content.Headers.ContentLength.HasValue) return request.Content.Headers.ContentLength.Value;
-        return request.Content.ReadAsStream().Length;
-        // return -1;
+        if (request.Content is StreamContent streamContent) {
+            try {
+                return streamContent.ReadAsStream().Length;
+            }
+            catch (NotSupportedException) {
+                return -1;
+            }
+        }
+        return -1;
     }
 
     public static long GetContentLength(this HttpResponseMessage response) {
@@ -100,9 +107,9 @@ public static class HttpExtensions {
         // "(123 B)"
         // TODO: what does No Content mean for Content's value?
         // if (response.Content != null) {
-            var contentLength = response.GetContentLength();
-            if (contentLength > 0) sb.Append($" ({Util.BytesToString(contentLength)})");
-            else sb.Append(" (stream)");
+        var contentLength = response.GetContentLength();
+        if (contentLength > 0) sb.Append($" ({Util.BytesToString(contentLength)})");
+        else sb.Append(" (stream)");
         // }
 
         // "200 OK"
