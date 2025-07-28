@@ -1,0 +1,46 @@
+@using Microsoft.AspNetCore.Components.Forms
+@* https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications#using_a_label_element_to_trigger_a_hidden_file_input_element *@
+<InputFile
+    class="visually-hidden"
+    id="@Id"
+    multiple="@Multiple"
+    accept="@Accept"
+    OnChange="@FilesPicked"/>
+<label class="fake-hyperlink" for="@Id">@Summary</label>
+
+
+@code {
+    private Guid Id { get; } = Guid.NewGuid();
+
+    [Parameter]
+    public required EventCallback<InputFileChangeEventArgs> OnFilePicked { get; set; }
+
+    [Parameter]
+    public bool Multiple { get; set; } = false;
+
+    [Parameter]
+    public string Accept { get; set; } = "*";
+
+    private string Summary { get; set; } = "Select a file...";
+
+    private async Task FilesPicked(InputFileChangeEventArgs fileChangeEvent) {
+        Console.WriteLine($"FilesPicked called with {fileChangeEvent.FileCount} files.");
+        if (fileChangeEvent.FileCount > 0) {
+            Summary = Multiple ? $"{fileChangeEvent.FileCount} files selected" : fileChangeEvent.File.Name;
+        }
+        else {
+            Summary = "No files selected";
+        }
+        
+        StateHasChanged();
+        _ = OnFilePicked.InvokeAsync(fileChangeEvent);
+    }
+
+    protected override void OnInitialized() {
+        Console.WriteLine("SimpleFilePicker initialized.");
+        if (Multiple) {
+            Summary = "Select some files...";
+        }
+    }
+
+}
