@@ -1,10 +1,10 @@
 @for (var i = 0; i < Items.Count; i++) {
-    var self = i;
-    <button @onclick="() => { Items.RemoveAt(self); ItemsChanged.InvokeAsync(); }">Remove</button>
-    <FancyTextBox Value="@Items[self]" ValueChanged="@(obj => InputChanged(obj, self))"/>
+    var index = i;
+    <LinkButton InlineText="true" OnClick="@(() => RemoveItem(index))">-</LinkButton>
+    <FancyTextBox Value="@Items[index]" ValueChanged="@(value => UpdateItem(index, value))"/>
     <br/>
 }
-<button @onclick="() => { Items.Add(string.Empty); ItemsChanged.InvokeAsync(); }">Add</button>
+<LinkButton InlineText="true" OnClick="@AddItem">+</LinkButton>
 
 @code {
 
@@ -12,8 +12,19 @@
     public List<string> Items { get; set; } = new();
 
     [Parameter]
-    [EditorRequired]
-    public EventCallback ItemsChanged { get; set; }
+    public EventCallback<List<string>> ItemsChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<int>? ItemAdded { get; set; }
+
+    [Parameter]
+    public EventCallback<(int Index, string Value)>? ItemUpdated { get; set; }
+
+    [Parameter]
+    public EventCallback<(int Index, string Value)>? ItemRemoved { get; set; }
+
+    [Parameter]
+    public bool AllowEmpty { get; set; } = true;
 
     protected override Task OnInitializedAsync() {
         Console.WriteLine($"StringListEditor initialized with {Items.Count} items: {string.Join(",", Items)}");
@@ -23,7 +34,49 @@
     private void InputChanged(string obj, int i) {
         Console.WriteLine($"StringListEditor inputChanged {i} {obj}");
         Items[i] = obj;
-        ItemsChanged.InvokeAsync();
+        ItemsChanged.InvokeAsync(Items);
+    }
+
+    private void AddItem() {
+        if (!AllowEmpty) {
+            if (Items.Any(string.IsNullOrWhiteSpace)) {
+                Console.WriteLine("Cannot add empty item when AllowEmpty is false.");
+                return;
+            }
+        }
+        
+        Console.WriteLine($"StringListEditor inputAdded {Items.Count - 1}");
+
+        Items.Add(string.Empty);
+        ItemsChanged.InvokeAsync(Items);
+        ItemAdded?.InvokeAsync(Items.Count - 1);
+    }
+
+    private void RemoveItem(int i) {
+        if (i < 0 || i >= Items.Count) {
+            Console.WriteLine($"Cannot remove item at index {i}, out of bounds.");
+            return;
+        }
+        
+        Console.WriteLine($"StringListEditor inputRemoved {i} {Items[i]}");
+
+        var removedItem = Items[i];
+        Items.RemoveAt(i);
+        ItemsChanged.InvokeAsync(Items);
+        ItemRemoved?.InvokeAsync((i, removedItem));
+    }
+
+    private void UpdateItem(int i, string value) {
+        if (i < 0 || i >= Items.Count) {
+            Console.WriteLine($"Cannot update item at index {i}, out of bounds.");
+            return;
+        }
+        
+        Console.WriteLine($"StringListEditor inputChanged {i} {value}");
+
+        Items[i] = value;
+        ItemsChanged.InvokeAsync(Items);
+        ItemUpdated?.InvokeAsync((i, value));
     }
 
 }
