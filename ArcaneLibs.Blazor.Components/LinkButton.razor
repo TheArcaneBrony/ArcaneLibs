@@ -1,17 +1,22 @@
-<a role="@(OnClick is null ? "link" : "button")" href="@href" target="@target" class="btn btn-primary" @onclick="Callback"
-   style="background-color: @(Color ?? "#1b6ec2"); @(Round ? "border-radius: 25px;" : "")">
+<a role="@(OnClick is null && OnClickAsync is null ? "link" : "button")" href="@href" target="@target" class="@(InlineText ? null : "btn btn-primary")" @onclick="Callback"
+   style="@($"{(InlineText ? $"color: {Color ?? "#1b6ec2"}; text-decoration-line: underline; padding-right: 1em;" : $"background-color: {Color ?? "#1b6ec2"};")} {(Round ? "border-radius: 25px; " : "")} {style}")">
     @ChildContent
 </a>
 
-@* ReSharper disable once InconsistentNaming *@
 
 @code {
 
+    // ReSharper disable once InconsistentNaming
     [Parameter]
     public string? href { get; set; }
 
+    // ReSharper disable once InconsistentNaming
     [Parameter]
     public string? target { get; set; }
+    
+    // ReSharper disable once InconsistentNaming
+    [Parameter]
+    public string? style { get; set; }
 
     [Parameter]
     public required RenderFragment? ChildContent { get; set; }
@@ -20,11 +25,20 @@
     public string? Color { get; set; }
 
     [Parameter]
-    public Func<Task>? OnClick { get; set; }
+    public Action? OnClick { get; set; }
+
+    [Parameter]
+    public Func<Task>? OnClickAsync { get; set; }
 
     [Parameter]
     public bool Round { get; set; }
 
-    private void Callback() => OnClick?.Invoke();
+    [Parameter]
+    public bool InlineText { get; set; }
+
+    private void Callback() {
+        OnClick?.Invoke();
+        _ = OnClickAsync?.Invoke();
+    }
 
 }
