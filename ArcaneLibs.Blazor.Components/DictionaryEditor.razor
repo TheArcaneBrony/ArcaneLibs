@@ -1,38 +1,103 @@
+@typeparam TKey where TKey : notnull
 @using ArcaneLibs.Extensions
-<table>
-    @foreach (var i in Items.Keys) {
-        var key = i;
-        <input value="@Items[key]" @oninput="obj => InputChanged(obj, key)">
-        <button @onclick="() => { Items.Remove(key); ItemsChanged.InvokeAsync(); }">Remove</button>
-        <br/>
+@typeparam TValue
+
+@foreach (var (key, value) in Items) {
+    var index = key;
+    <LinkButton InlineText="true" OnClick="@(() => RemoveItem(key))">-</LinkButton>
+    @if (typeof(TKey) == typeof(string)) {
+        <FancyTextBox Value="@(key as string)" ValueChanged="@(x => UpdateKey(key, x is TKey ? (TKey)(object)x : throw new InvalidDataException()))"/>
     }
-</table>
-<button @onclick="() => { Items.Add(string.Empty, default); ItemsChanged.InvokeAsync(); }">Add</button>
+
+    <span>: </span>
+    @* @switch (typeof(TKey)) { *@
+    @*     typeof(string) => { *@
+    @*         <FancyTextBox Value="@(Items[index] as string)" ValueChanged="@(value => UpdateValue(index, value as TValue))"/> *@
+    @*     } *@
+    @*      *@
+    @* } *@
+
+    <br/>
+}
+<LinkButton InlineText="true" OnClick="@AddItem">+</LinkButton>
 
 @code {
 
     [Parameter]
-    public Dictionary<string, object?> Items { get; set; } = new();
+    public required Dictionary<TKey, TValue> Items { get; set; } = new();
 
     [Parameter]
-    [EditorRequired]
-    public EventCallback ItemsChanged { get; set; }
+    public EventCallback<Dictionary<TKey, TValue>> ItemsChanged { get; set; }
 
     [Parameter]
-    public Func<string, string>? KeyFormatter { get; set; }
+    public EventCallback<TKey>? ItemAdded { get; set; }
 
     [Parameter]
-    public Action? OnFocusLost { get; set; }
+    public required TKey DefaultKey { get; set; }
+
+    [Parameter]
+    public required TValue DefaultValue { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<(TKey Key, TKey Value)>? KeyUpdated { get; set; }
+
+    [Parameter]
+    public EventCallback<(TKey Key, TValue Value)>? ItemUpdated { get; set; }
+
+    [Parameter]
+    public EventCallback<(TKey Key, TValue Value)>? ItemRemoved { get; set; }
 
     protected override Task OnInitializedAsync() {
-        Console.WriteLine($"DictionaryEditor initialized with {Items.Count} items: {Items.ToJson()}");
+        Console.WriteLine($"DictionaryEditor initialized with {Items.Count} items: {string.Join(",", Items)}");
         return base.OnInitializedAsync();
     }
 
-    private void InputChanged(ChangeEventArgs obj, string key) {
-        Console.WriteLine($"StringListEditor inputChanged {key} {obj.Value}");
-        Items[key] = obj.Value?.ToString();
-        ItemsChanged.InvokeAsync();
+    private void AddItem() {
+        Console.WriteLine($"DictionaryEditor inputAdded {Items.Count - 1}");
+
+        Items.Add(DefaultKey, DefaultValue);
+        ItemsChanged.InvokeAsync(Items);
+        ItemAdded?.InvokeAsync(Items.Last().Key);
+    }
+
+    private void RemoveItem(TKey key) {
+        if (!Items.TryGetValue(key, out var item)) {
+            Console.WriteLine($"Cannot remove key {key}, no such key.");
+            return;
+        }
+
+        Console.WriteLine($"DictionaryEditor inputRemoved {key} {item}");
+
+        var removedItem = Items[key];
+        Items.Remove(key);
+        ItemsChanged.InvokeAsync(Items);
+        ItemRemoved?.InvokeAsync((key, removedItem));
+    }
+
+    private void UpdateKey(TKey key, TKey value) {
+        if (!Items.ContainsKey(key)) {
+            Console.WriteLine($"Cannot update item at index {key}, out of bounds.");
+            return;
+        }
+
+        Console.WriteLine($"DictionaryEditor inputChanged Key {key} {value}");
+
+        Items.ChangeKey(key, value);
+        ItemsChanged.InvokeAsync(Items);
+        KeyUpdated?.InvokeAsync((key, value));
+    }
+
+    private void UpdateValue(TKey key, TValue value) {
+        if (!Items.ContainsKey(key)) {
+            Console.WriteLine($"Cannot update item at index {key}, out of bounds.");
+            return;
+        }
+
+        Console.WriteLine($"DictionaryEditor inputChanged {key} {value}");
+
+        Items[key] = value;
+        ItemsChanged.InvokeAsync(Items);
+        ItemUpdated?.InvokeAsync((key, value));
     }
 
 }
