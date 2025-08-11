@@ -1,0 +1,77 @@
+@using System.Text
+@using System.Text.Json
+@typeparam T where T : class, new()
+
+@if (!string.IsNullOrWhiteSpace(JsonText)) {
+    <FancyTextBox Multiline="true" Value="@JsonText" ValueChanged="@JsonTextChanged"></FancyTextBox>
+}
+
+@code {
+    [Parameter]
+    public required T Value { get; set; }
+    
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+
+    private string JsonText { get; set; } = string.Empty;
+
+    private static readonly SemaphoreSlim ss = new SemaphoreSlim(8, 8);
+
+    private T? _prevValue;
+    private bool _shouldRender = false;
+    
+    protected override async Task OnParametersSetAsync() {
+        if (_prevValue != Value) {
+            await ss.WaitAsync().ConfigureAwait(false);
+            // await Task.Delay(Random.Shared.Next(10000)).ConfigureAwait(false);
+            // Console.WriteLine("FancyTextBoxLazyJson: OnParametersSetAsync called");
+            try {
+                await using var ms = new MemoryStream();
+                await JsonSerializer.SerializeAsync(ms, Value, new JsonSerializerOptions { WriteIndented = true });
+                var json = Encoding.UTF8.GetString(ms.ToArray());
+                if (json != JsonText) {
+                    JsonText = json;
+                    _shouldRender = true;
+                    // Console.WriteLine($"FancyTextBoxLazyJson: Serialized Value to JSON");
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"Failed to serialize Value: {ex.Message}");
+                JsonText = string.Empty;
+            }
+            finally {
+                _prevValue = Value;
+                ss.Release();
+            }
+        }
+    }
+
+    protected override bool ShouldRender() {
+        bool shouldRender = _shouldRender;
+        _shouldRender = false;
+        return shouldRender;
+    }
+
+    private void JsonTextChanged(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            Value = default!;
+        }
+        else
+        {
+            try
+            {
+                Value = JsonSerializer.Deserialize<T>(json) ?? default!;
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"Failed to deserialize JSON: {ex.Message}");
+                Value = default!;
+            }
+        }
+        
+        ValueChanged.InvokeAsync(Value);
+    }
+
+}

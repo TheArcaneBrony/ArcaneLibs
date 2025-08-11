@@ -45,6 +45,16 @@ public static class CollectionExtensions {
             }
         }
     }
+    
+    public static void Replace<T>(this List<T> list, T oldItem, T newItem) {
+        var index = list.IndexOf(oldItem);
+        if (index != -1) {
+            list[index] = newItem;
+        }
+        else {
+            list.Add(newItem);
+        }
+    }
 
     public static bool ContainsAll<T>(this IEnumerable<T> list, IEnumerable<T> other) {
         return !other.Except(list).Any();
