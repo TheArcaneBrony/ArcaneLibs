@@ -45,7 +45,7 @@ public static class CollectionExtensions {
             }
         }
     }
-    
+
     public static void Replace<T>(this List<T> list, T oldItem, T newItem) {
         var index = list.IndexOf(oldItem);
         if (index != -1) {
@@ -58,5 +58,39 @@ public static class CollectionExtensions {
 
     public static bool ContainsAll<T>(this IEnumerable<T> list, IEnumerable<T> other) {
         return !other.Except(list).Any();
+    }
+
+    public static IEnumerable<IEnumerable<T>> Split<T>(this IEnumerable<T> source, T value) {
+        var currentGroup = new List<T>();
+        foreach (var item in source) {
+            if (item?.Equals(value) ?? false) {
+                if (currentGroup.Count > 0) {
+                    yield return currentGroup;
+                    currentGroup = new List<T>();
+                }
+            }
+            else currentGroup.Add(item);
+        }
+
+        if (currentGroup.Count > 0) {
+            yield return currentGroup;
+        }
+    }
+
+    public static IEnumerable<IEnumerable<T>> SplitBy<T>(this IEnumerable<T> source, Func<T, bool> predicate) {
+        var currentGroup = new List<T>();
+        foreach (var item in source) {
+            if (predicate(item)) {
+                if (currentGroup.Count > 0) {
+                    yield return currentGroup;
+                    currentGroup = new List<T>();
+                }
+            }
+            else currentGroup.Add(item);
+        }
+
+        if (currentGroup.Count > 0) {
+            yield return currentGroup;
+        }
     }
 }
