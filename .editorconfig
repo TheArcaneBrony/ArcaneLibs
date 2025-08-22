@@ -1,10 +1,12 @@
+root = true
+
 [*]
 charset = utf-8
 end_of_line = lf
+indent_size = 4
+indent_style = space
 trim_trailing_whitespace = true
 insert_final_newline = true
-indent_style = space
-indent_size = 4
 tab_width = 4
 
 # Microsoft .NET properties
@@ -372,6 +374,7 @@ dotnet_style_qualification_for_method = false:suggestion
 dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:error
 file_header_template = # ReSharper properties
+
 
 resharper_alignment_tab_fill_style = use_spaces
 resharper_align_first_arg_by_paren = false
@@ -1792,3 +1795,12 @@ resharper_xaml_xaml_xamarin_forms_data_type_and_binding_context_type_mismatched_
 resharper_xaml_x_key_attribute_disallowed_highlighting = error
 resharper_xunit_xunit_test_with_console_output_highlighting = warning
 resharper_zero_index_from_end_highlighting = warning
+
+# ReSharper properties
+resharper_csharp_int_align_comments = true
+
+[*.html]
+indent_size = 4
+tab_width = 4
+indent_style = space
+ij_html_do_not_indent_children_of_tags = 

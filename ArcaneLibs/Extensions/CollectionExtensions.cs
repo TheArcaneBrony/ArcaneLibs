@@ -25,24 +25,18 @@ public static class CollectionExtensions {
     public static void MergeBy<T>(this List<T> list, IEnumerable<T> other, Func<T, T, bool> predicate, Action<T, T> mergeAction) {
         foreach (var item in other) {
             var existing = list.FirstOrDefault(x => predicate(x, item));
-            if (existing is not null) {
+            if (existing is not null)
                 mergeAction(existing, item);
-            }
-            else {
-                list.Add(item);
-            }
+            else list.Add(item);
         }
     }
 
     public static void ReplaceBy<T>(this List<T> list, IEnumerable<T> other, Func<T, T, bool> predicate) {
         foreach (var item in other) {
             var existing = list.FindIndex(x => predicate(x, item));
-            if (existing != -1) {
+            if (existing != -1)
                 list[existing] = item;
-            }
-            else {
-                list.Add(item);
-            }
+            else list.Add(item);
         }
     }
 
@@ -66,7 +60,7 @@ public static class CollectionExtensions {
             if (item?.Equals(value) ?? false) {
                 if (currentGroup.Count > 0) {
                     yield return currentGroup;
-                    currentGroup = new List<T>();
+                    currentGroup = [];
                 }
             }
             else currentGroup.Add(item);
@@ -79,7 +73,7 @@ public static class CollectionExtensions {
 
     public static IEnumerable<IEnumerable<T>> SplitBy<T>(this IEnumerable<T> source, Func<T, bool> predicate) {
         var currentGroup = new List<T>();
-        foreach (var item in source) {
+        foreach (var item in source)
             if (predicate(item)) {
                 if (currentGroup.Count > 0) {
                     yield return currentGroup;
@@ -87,10 +81,40 @@ public static class CollectionExtensions {
                 }
             }
             else currentGroup.Add(item);
+
+        if (currentGroup.Count > 0)
+            yield return currentGroup;
+    }
+
+    public static List<List<T>> Distribute<T>(this IEnumerable<T> source, int count) {
+        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count), "Count must be greater than 0");
+
+        var groups = new List<List<T>>(count);
+        for (var i = 0; i < count; i++)
+            groups.Add([]);
+
+        var index = 0;
+        foreach (var item in source)
+            groups[index++ % count].Add(item);
+
+        return groups;
+    }
+
+    public static List<List<T>> DistributeSequentially<T>(this IEnumerable<T> source, int count) {
+        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count), "Count must be greater than 0");
+
+        var list = source.ToList();
+        var groups = new List<List<T>>(count);
+        for (var i = 0; i < count; i++)
+            groups.Add([]);
+
+        // [1,2,3],[4,5,6],[7,8,9]...
+        for (var i = 0; i < list.Count; i++) {
+            int idx = (int)MathF.Floor(i / (float)list.Count * count);
+            // Console.WriteLine($"{i}/{list.Count} -> {idx}:{groups[idx].Count}/{count}");
+            groups[idx].Add(list[i]);
         }
 
-        if (currentGroup.Count > 0) {
-            yield return currentGroup;
-        }
+        return groups;
     }
 }
