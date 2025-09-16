@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <CopyOutputSymbolsToPublishDirectory>true</CopyOutputSymbolsToPublishDirectory>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">

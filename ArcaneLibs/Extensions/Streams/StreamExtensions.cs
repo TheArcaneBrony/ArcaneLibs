@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -177,6 +178,37 @@ public static class StreamExtensions {
         // if (stream.ReadByte() == terminator) stream.Skip();
     }
 
+    public static async IAsyncEnumerable<byte> ReadTerminatedFieldWithoutPeekingAsync(this Stream stream, byte terminator, IEnumerable<byte>? binaryPrefix = null,
+        string? asciiPrefix = null) {
+        if (!stream.CanRead)
+            throw new InvalidOperationException("Can't read a non-readable stream");
+        if (binaryPrefix != null)
+            if (!stream.StartsWith(binaryPrefix))
+                throw new InvalidDataException(
+                    $"Binary prefix {stream.Peek(binaryPrefix.Count()).AsHexString()} does not match expected value of {binaryPrefix.AsHexString()}!");
+            else stream.Skip(binaryPrefix.Count());
+        else if (asciiPrefix != null)
+            if (!stream.StartsWith(asciiPrefix))
+                throw new InvalidDataException(
+                    $"Text prefix {stream.Peek(asciiPrefix.Length).AsHexString()} ({stream.Peek(asciiPrefix.Length).AsString()}) does not match expected value of {asciiPrefix.AsBytes().AsHexString()} ({asciiPrefix})!");
+            else stream.Skip(asciiPrefix.Length);
+
+        var read = 0;
+        int b;
+        while ((b = await stream.ReadByteAsync()) != terminator) {
+            // if (_debug)
+            //     Console.WriteLine(
+            //         $"ReadTerminatedField -- pos: {stream.Position}/+{stream.Remaining()}/{stream.Length} | next: {(char)stream.Peek()} | Length: {read}");
+            if (b == -1) {
+                // if (_debug) Console.WriteLine("Warning: Reached end of stream while reading null-terminated field");
+                yield break;
+            }
+
+            read++;
+            yield return (byte)b;
+        }
+    }
+
     public static IEnumerable<byte> ReadToEnd(this Stream stream) {
         if (!stream.CanRead)
             throw new InvalidOperationException("Can't read a non-readable stream");
@@ -184,6 +216,12 @@ public static class StreamExtensions {
         int read;
         while ((read = stream.ReadByte()) != -1)
             yield return (byte)read;
+    }
+
+    public static async Task<int> ReadByteAsync(this Stream stream) {
+        var buffer = new byte[1];
+        var read = await stream.ReadAsync(buffer, 0, 1);
+        return read == 0 ? -1 : buffer[0];
     }
 
 #region Read basic datatypes
