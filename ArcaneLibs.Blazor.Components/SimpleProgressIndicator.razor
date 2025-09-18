@@ -1,0 +1,136 @@
+<span>
+    <span>@RealValue/@RealMax</span>
+    <progress value="@RealValue" max="@RealMax"></progress>
+    @if (!string.IsNullOrWhiteSpace(RealLabel)) {
+        <span style="margin-left: 0.5em;">@RealLabel</span>
+    }
+</span>
+
+@code {
+
+    [Parameter]
+    public float Value { get; set; }
+
+    [Parameter]
+    public float Max { get; set; } = 100;
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public ObservableValue<float>? ObservableValue {
+        get;
+        set {
+            if (field == value) return;
+            if (field is not null)
+                field.ValueChanged -= ValueChanged;
+            field = value;
+
+            if (field is null) return;
+            field.ValueChanged += ValueChanged;
+            Value = field.Value;
+        }
+    }
+
+    [Parameter]
+    public ObservableValue<float>? ObservableMax {
+        get;
+        set {
+            if (field == value) return;
+            if (field is not null)
+                field.ValueChanged -= MaxChanged;
+            field = value;
+
+            if (field is null) return;
+            field.ValueChanged += MaxChanged;
+            Max = field.Value;
+        }
+    }
+
+    [Parameter]
+    public ObservableValue<string?>? ObservableLabel {
+        get;
+        set {
+            if (field == value) return;
+            if (field is not null)
+                field.ValueChanged -= LabelChanged;
+            field = value;
+
+            if (field is null) return;
+            field.ValueChanged += LabelChanged;
+            Label = field.Value;
+        }
+    }
+
+    [Parameter]
+    public bool LabelOnNewLine { get; set; }
+
+    [Parameter]
+    public ObservableProgressState? ObservableProgress {
+        get;
+        set {
+            if (field == value) return;
+            field = value;
+            ObservableValue = value?.Value;
+            ObservableMax = value?.Max;
+            ObservableLabel = value?.Label;
+        }
+    }
+
+    private void ValueChanged(object? caller, float newValue) {
+        Value = newValue;
+        _ = DebouncedStateHasChanged();
+    }
+
+    private void MaxChanged(object? caller, float newMax) {
+        Max = newMax;
+        _ = DebouncedStateHasChanged();
+    }
+
+    private void LabelChanged(object? caller, string? newLabel) {
+        Label = newLabel;
+        _ = DebouncedStateHasChanged();
+    }
+
+    private float RealValue => ObservableProgress?.Value.Value ?? ObservableValue?.Value ?? Value;
+    private float RealMax => ObservableProgress?.Max.Value ?? ObservableMax?.Value ?? Max;
+    private string? RealLabel => ObservableProgress?.Label.Value ?? ObservableLabel?.Value ?? Label;
+
+    // debounce logic - if multiple changes come in quick succession, only render once
+    // private CancellationTokenSource _debounceCts = new CancellationTokenSource();
+
+    private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
+    private async Task DebouncedStateHasChanged() {
+        // _debounceCts.Cancel();
+        // _debounceCts = new CancellationTokenSource();
+        // try {
+        //     await Task.Delay(100, _debounceCts.Token);
+        //     Console.WriteLine("DebouncedStateHasChanged - Calling StateHasChanged!");
+        //     StateHasChanged();
+        // }
+        // catch (TaskCanceledException) { }
+        // inverse - maximise rate at 10/s instead of delaying indefinitely
+        await _semaphore.WaitAsync();
+        try {
+            StateHasChanged();
+            await Task.Delay(1);
+        }
+        finally {
+            _semaphore.Release();
+        }
+    }
+
+    public class ObservableProgressState(float initialValue = 0, float initialMax = 100, string? initialLabel = null) {
+        public ObservableValue<float> Value { get; init; } = new(initialValue);
+        public ObservableValue<float> Max { get; init; } = new(initialMax);
+        public ObservableValue<string?> Label { get; init; } = new(initialLabel);
+
+        public void Next(string? newLabel = null) {
+            Value.SetValue(Value.Value + 1, inhibitEvent: newLabel is not null);
+            if (newLabel is not null)
+                Label.Value = newLabel;
+        }
+    }
+
+}

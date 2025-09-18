@@ -13,7 +13,7 @@
     // ReSharper disable once InconsistentNaming
     [Parameter]
     public string? target { get; set; }
-    
+
     // ReSharper disable once InconsistentNaming
     [Parameter]
     public string? style { get; set; }
@@ -36,9 +36,10 @@
     [Parameter]
     public bool InlineText { get; set; }
 
-    private void Callback() {
+    private async Task Callback() {
         OnClick?.Invoke();
-        _ = OnClickAsync?.Invoke();
+        if (OnClickAsync is not null)
+            await OnClickAsync.Invoke();
     }
 
 }

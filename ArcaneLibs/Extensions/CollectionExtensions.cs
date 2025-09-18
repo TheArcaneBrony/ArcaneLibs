@@ -102,6 +102,7 @@ public static class CollectionExtensions {
 
     public static List<List<T>> DistributeSequentially<T>(this IEnumerable<T> source, int count) {
         if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count), "Count must be greater than 0");
+        if (count == 1) return [source.ToList()];
 
         var list = source.ToList();
         var groups = new List<List<T>>(count);
