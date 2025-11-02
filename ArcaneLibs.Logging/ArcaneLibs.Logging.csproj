@@ -6,7 +6,11 @@
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
-        <PackageReadmeFile>../README.md</PackageReadmeFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 
 </Project>

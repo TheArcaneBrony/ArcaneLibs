@@ -6,8 +6,12 @@
         <IsPackable>false</IsPackable>
         <LangVersion>latest</LangVersion>
         <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
-        <PackageReadmeFile>../README.md</PackageReadmeFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />

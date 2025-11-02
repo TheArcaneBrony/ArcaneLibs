@@ -8,8 +8,12 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <CopyOutputSymbolsToPublishDirectory>true</CopyOutputSymbolsToPublishDirectory>
         <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
-        <PackageReadmeFile>../README.md</PackageReadmeFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <Optimize>true</Optimize>
