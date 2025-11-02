@@ -9,7 +9,7 @@
         <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
         <InvariantGlobalization>true</InvariantGlobalization>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <PublishAot>true</PublishAot>
+<!--        <PublishAot>true</PublishAot>-->
     </PropertyGroup>
 
 
