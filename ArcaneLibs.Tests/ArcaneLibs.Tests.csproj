@@ -3,10 +3,10 @@
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
-
         <IsPackable>false</IsPackable>
-
         <LangVersion>latest</LangVersion>
+        <PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
+        <PackageReadmeFile>../README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>

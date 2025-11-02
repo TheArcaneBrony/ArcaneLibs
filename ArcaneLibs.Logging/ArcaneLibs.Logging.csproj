@@ -5,6 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
+        <PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
+        <PackageReadmeFile>../README.md</PackageReadmeFile>
     </PropertyGroup>
 
 </Project>

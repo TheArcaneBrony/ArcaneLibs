@@ -9,6 +9,8 @@
         <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
         <InvariantGlobalization>true</InvariantGlobalization>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
+        <PackageReadmeFile>../README.md</PackageReadmeFile>
 <!--        <PublishAot>true</PublishAot>-->
     </PropertyGroup>
 
