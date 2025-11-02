@@ -3,6 +3,7 @@ export DATE=`git log -1 --format="%at" | xargs -I{} date -d @{} '+%Y%m%d-%H%M%S'
 export REV=`git rev-parse --short HEAD`
 echo "preview.$DATE+$REV" > version.txt
 git add version.txt
+rm ./result*
 
 for p in `nix flake show --json | jq '.packages."x86_64-linux" | keys[]' -r`
 do
