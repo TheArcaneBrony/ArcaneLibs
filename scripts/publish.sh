@@ -12,8 +12,6 @@ do
 done
 wait
 
-
-
 for p in result*/share/nuget/packages/*/*/.unpacked
 do
     PNAME=$(basename `realpath "${p}/../.."`)
@@ -24,3 +22,4 @@ do
 done
 
 dotnet nuget push *.nupkg -k ${NUGET_KEY} --source https://api.nuget.org/v3/index.json --skip-duplicate
+git restore version.txt
