@@ -15,11 +15,14 @@ wait
 for p in result*/share/nuget/packages/*/*/.unpacked
 do
     PNAME=$(basename `realpath "${p}/../.."`)
-    echo $PNAME:
-    cd "${p}"
+    PRNAME=$(basename $(cd "${p}/../../../../../.." && echo $PWD))
+    echo $PNAME: $PRNAME
+    cd "${p}" || continue
     zip -db -ds 32k -9 -r "${BASEDIR}/${PNAME//./-}.nupkg" *
     cd -
+    dotnet nuget push *.nupkg -k ${NUGET_KEY} --source https://api.nuget.org/v3/index.json --skip-duplicate
+    rm -rfv "${PRNAME}" "${PNAME//./-}.nupkg"
 done
 
-dotnet nuget push *.nupkg -k ${NUGET_KEY} --source https://api.nuget.org/v3/index.json --skip-duplicate
 git restore version.txt
+rm version.txt
