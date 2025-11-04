@@ -10,7 +10,11 @@
     }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      rVersion = pkgs.lib.trim (builtins.readFile ./version.txt);
+      rVersion = let
+        rev = self.sourceInfo.shortRev or self.sourceInfo.dirtyShortRev;
+        date = builtins.substring 0 8 self.sourceInfo.lastModifiedDate;
+        time = builtins.substring 8 6 self.sourceInfo.lastModifiedDate;
+      in "preview.${date}-${time}+${rev}";
       makeNupkg =
         {name, nugetDeps ? null, projectReferences ? []}:
         pkgs.buildDotnetModule rec {

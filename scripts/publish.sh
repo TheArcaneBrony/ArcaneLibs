@@ -1,9 +1,4 @@
-#DATE=`date -u '+%Y%m%d-%H%M%S'`
-DATE=`git log -1 --format="%at" | xargs -I{} date -d @{} '+%Y%m%d-%H%M%S'`
-REV=`git rev-parse --short HEAD`
 BASEDIR="$PWD"
-echo "preview.$DATE+$REV" > version.txt
-git add version.txt
 rm ./result* *.nupkg
 
 for p in `nix flake show --json | jq '.packages."x86_64-linux" | keys[]' -r`
@@ -23,6 +18,3 @@ do
     dotnet nuget push *.nupkg -k ${NUGET_KEY} --source https://api.nuget.org/v3/index.json --skip-duplicate
     rm -rfv "${PRNAME}" "${PNAME//./-}.nupkg"
 done
-
-git restore version.txt
-rm version.txt
