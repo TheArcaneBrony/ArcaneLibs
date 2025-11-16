@@ -19,7 +19,7 @@
         {name, nugetDeps ? null, projectReferences ? []}:
         pkgs.buildDotnetModule rec {
           inherit projectReferences nugetDeps;
-          
+
           pname = "${name}";
           version = "1.0.0-" + rVersion;
           dotnetPackFlags = [ "--include-symbols" "--include-source" "--version-suffix ${rVersion}" ];
@@ -51,5 +51,8 @@
         ArcaneLibs-StringNormalisation = makeNupkg { name = "ArcaneLibs.StringNormalisation"; nugetDeps = ./ArcaneLibs.StringNormalisation/deps.json; };
         ArcaneLibs-Timings = makeNupkg { name = "ArcaneLibs.Timings"; };
       };
+      checks = pkgs.lib.attrsets.unionOfDisjoint {
+        # Actual checks
+      } self.packages;
     };
 }
