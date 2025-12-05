@@ -3,7 +3,7 @@ rm ./result* *.nupkg
 
 for p in `nix flake show --json | jq '.packages."x86_64-linux" | keys[]' -r`
 do
-    nix build .\#${p} -j4 -L --out-link ./result-${p//-/\.} &
+    nix build .\#${p} -j4 -L --out-link ./result-${p//-/\.}
 done
 wait
 
