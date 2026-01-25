@@ -10,6 +10,7 @@
     }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      ver = "1.0.1";
       rVersion =
         let
           rev = self.sourceInfo.shortRev or self.sourceInfo.dirtyShortRev;
@@ -27,11 +28,12 @@
           inherit projectReferences nugetDeps;
 
           pname = "${name}";
-          version = "1.0.0-" + rVersion;
+          version = ver + "-" + rVersion;
           dotnetPackFlags = [
             "--include-symbols"
             "--include-source"
-            "--version-suffix ${rVersion}"
+            "--version ${ver}-${rVersion}"
+            # "--version-suffix ${rVersion}"
           ];
           dotnet-sdk = pkgs.dotnet-sdk_10;
           dotnet-runtime = pkgs.dotnet-aspnetcore_10;
