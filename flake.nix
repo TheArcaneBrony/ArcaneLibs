@@ -10,11 +10,13 @@
     }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      rVersion = let
-        rev = self.sourceInfo.shortRev or self.sourceInfo.dirtyShortRev;
-        date = builtins.substring 0 8 self.sourceInfo.lastModifiedDate;
-        time = builtins.substring 8 6 self.sourceInfo.lastModifiedDate;
-      in "preview.${date}-${time}"; # +${rev}";
+      rVersion =
+        let
+          rev = self.sourceInfo.shortRev or self.sourceInfo.dirtyShortRev;
+          date = builtins.substring 0 8 self.sourceInfo.lastModifiedDate;
+          time = builtins.substring 8 6 self.sourceInfo.lastModifiedDate;
+        in
+        "preview.${date}-${time}"; # +${rev}";
       makeNupkg =
         {
           name,
@@ -92,5 +94,13 @@
             ln -vs ''\${path} $out/
           done
         '';
+      addNugetSource = pkgs.writeScriptBin "add-nuget-source" ''
+        #!/bin/sh
+        SRC_NAME='ArcaneLibs-${rVersion}'
+        SRC_DEST='${self.nugetArtifactDir."${pkgs.stdenv.hostPlatform.system}"}'
+
+        echo "Adding NuGet source '$SRC_NAME' pointing to '$SRC_DEST'..."
+        dotnet nuget add source --name 'ArcaneLibs-${rVersion}' "$SRC_DEST"
+      '';
     };
 }
