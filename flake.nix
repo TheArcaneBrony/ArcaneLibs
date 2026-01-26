@@ -75,7 +75,7 @@
         name: pkg:
         (
           with pkgs;
-          pkgs.runCommand (pkg.pname + "-" + pkg.version + ".nupkg") { } ''
+          pkgs.runCommand (pkg.pname + "." + pkg.version + ".nupkg") { } ''
             echo 'Creating zip archive for ${name}'
             set -x
             cd "${pkg.out}/share/nuget/packages/${lib.toLower pkg.pname}/${pkg.version}"
@@ -90,19 +90,34 @@
         let
           outPaths = pkgs.lib.mapAttrsToList (name: pkg: pkg.out) self.nupkgs.x86_64-linux;
         in
-        pkgs.runCommand "nuget-artifacts" { } ''
+        pkgs.runCommand ("ArcaneLibs-" + ver + "-" + rVersion + "-nuget-artifacts") { } ''
           mkdir -p $out
           for path in ${pkgs.lib.concatStringsSep " " outPaths}; do
             ln -vs ''\${path} $out/
           done
         '';
-      addNugetSource = pkgs.writeScriptBin "add-nuget-source" ''
-        #!/bin/sh
-        SRC_NAME='ArcaneLibs-${rVersion}'
-        SRC_DEST='${self.nugetArtifactDir."${pkgs.stdenv.hostPlatform.system}"}'
+      addNugetSource =
+        let
+          outPaths = pkgs.lib.mapAttrsToList (name: pkg: pkg.out) self.nupkgs.x86_64-linux;
+          nugetDir = pkgs.runCommand ("ArcaneLibs-" + ver + "-" + rVersion + "-nuget-artifacts") { } ''
+            mkdir -p $out
+            # ${pkgs.dotnet-sdk_10}/bin/dotnet nuget add source --name 'out' "$out"
+            export DOTNET_CLI_HOME=/tmp
+            for path in ${pkgs.lib.concatStringsSep " " outPaths}; do
+              ${pkgs.dotnet-sdk_10}/bin/dotnet nuget push "$path" --source "$out" &
+            done
+            wait 
+          '';
+        in
+        pkgs.writeScriptBin "add-nuget-source" ''
+          #!/bin/sh
+          SRC_NAME='ArcaneLibs-${rVersion}'
+          #SRC_DEST='${self.nugetArtifactDir."${pkgs.stdenv.hostPlatform.system}"}'
+          SRC_DEST='${nugetDir}'
 
-        echo "Adding NuGet source '$SRC_NAME' pointing to '$SRC_DEST'..."
-        dotnet nuget add source --name 'ArcaneLibs-${rVersion}' "$SRC_DEST"
-      '';
+          # echo "Adding NuGet source '$SRC_NAME' pointing to '$SRC_DEST'..."
+          # dotnet nuget add source --name 'ArcaneLibs-${rVersion}' "$SRC_DEST"
+          dotnet nuget add source --name "$SRC_DEST" "$SRC_DEST"
+        '';
     };
 }
