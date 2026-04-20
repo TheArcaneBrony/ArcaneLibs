@@ -77,8 +77,17 @@ public static class DictionaryExtensions {
         return array.SequenceEqual(list.Take(prefixLen));
     }
 
-    public static void HexDump(this IEnumerable<byte> bytes, int width = 32) {
-        var data = new Queue<(string hex, char utf8)>(bytes.ToArray().Select(x => ($"{x:X2}", (char)x)).ToArray());
+    public static void HexDump(this IEnumerable<byte> bytes, int width = 32, bool colorize = true) {
+        var data = new Queue<(string hex, char utf8)>(bytes.ToArray()
+            .Select(x => {
+                var hex = x.ToString("X");
+                if (colorize) {
+                    var clr = (r: (byte)((x >> 5) * 32), g: (byte)(((x & 28) >> 2) * 32), b: (byte)((x & 3) * 64));
+                    hex = ConsoleUtils.ColoredString(hex, clr.r, clr.g, clr.b);
+                }
+
+                return (hex, (char)x);
+            }).ToArray());
         while (data.Count > 0) {
             var line = data.Dequeue(Math.Min(width, data.Count)).ToArray();
             Console.WriteLine(
