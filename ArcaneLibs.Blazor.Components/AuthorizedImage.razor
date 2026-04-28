@@ -41,7 +41,6 @@
         if (string.IsNullOrWhiteSpace(src) || string.IsNullOrWhiteSpace(AccessToken)) return;
         if (string.IsNullOrWhiteSpace(_self.Id)) return;
         
-        
         ImportSemaphore.Enter();
         if (_streamExtensionsModule is null) {
             Logger.LogInformation("Importing AuthorizedImage JS module");
