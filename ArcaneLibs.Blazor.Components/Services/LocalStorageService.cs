@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 namespace ArcaneLibs.Blazor.Components.Services;
 
 public class BaseStorageService(IJSRuntime jsRuntime, string storageName) {
+    public async Task<string> GetItemAsync(string name) => await jsRuntime.InvokeAsync<string>(storageName + ".getItem", name);
     public async Task SetItemAsync(string name, string data) => await jsRuntime.InvokeVoidAsync(storageName + ".setItem", name, data);
     public async Task RemoveItemAsync(string name) => await jsRuntime.InvokeVoidAsync(storageName + ".removeItem", name);
     public async Task ClearAsync() => await jsRuntime.InvokeVoidAsync(storageName + ".clear");
