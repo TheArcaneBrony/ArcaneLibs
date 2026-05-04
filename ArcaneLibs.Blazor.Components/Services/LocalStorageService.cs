@@ -11,7 +11,7 @@ public class BaseStorageService(IJSRuntime jsRuntime, string storageName) {
     public async Task SetItemAsJsonAsync<T>(string name, T data) => await jsRuntime.InvokeVoidAsync(storageName + ".setItem", name, data);
     public async Task<T?> GetItemFromJsonAsync<T>(string name) {
         var json = await jsRuntime.InvokeAsync<string?>(storageName + ".getItem", name);
-        return json is null ? default : JsonSerializer.Deserialize<T>(json);
+        return string.IsNullOrWhiteSpace(json) ? default : JsonSerializer.Deserialize<T>(json);
     }
 }
 
