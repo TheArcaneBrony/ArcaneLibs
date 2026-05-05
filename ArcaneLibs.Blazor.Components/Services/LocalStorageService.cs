@@ -10,7 +10,8 @@ public class BaseStorageService(ILogger<BaseStorageService> logger, IJSRuntime j
     public async Task RemoveItemAsync(string name) => await jsRuntime.InvokeVoidAsync(storageName + ".removeItem", name);
     public async Task ClearAsync() => await jsRuntime.InvokeVoidAsync(storageName + ".clear");
     public async Task<bool> ContainsKeyAsync(string key) => await jsRuntime.InvokeAsync<bool>(storageName + ".hasOwnProperty", key);
-    public async Task SetItemAsJsonAsync<T>(string name, T data) => await jsRuntime.InvokeVoidAsync(storageName + ".setItem", name, data);
+    public async Task SetItemAsJsonAsync<T>(string name, T data) => await jsRuntime.InvokeVoidAsync(storageName + ".setItem", name, JsonSerializer.Serialize(data));
+
     public async Task<T?> GetItemFromJsonAsync<T>(string name) {
         var json = await jsRuntime.InvokeAsync<string?>(storageName + ".getItem", name);
         logger.LogError("Got item from json: " + (json ?? "(actual null)"));
