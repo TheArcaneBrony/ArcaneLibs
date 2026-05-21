@@ -14,7 +14,7 @@ public class BaseStorageService(ILogger<BaseStorageService> logger, IJSRuntime j
 
     public async Task<T?> GetItemFromJsonAsync<T>(string name) {
         var json = await jsRuntime.InvokeAsync<string?>(storageName + ".getItem", name);
-        logger.LogError("Got item from json: " + (json ?? "(actual null)"));
+        // logger.LogError("Got item from json: " + (json ?? "(actual null)"));
         return string.IsNullOrWhiteSpace(json) ? default : JsonSerializer.Deserialize<T>(json);
     }
 }
