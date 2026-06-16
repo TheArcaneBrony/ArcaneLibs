@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace ArcaneLibs.Attributes;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public class FriendlyNameAttribute : Attribute {
     public required string Name { get; set; }
     public string? NamePlural { get; set; }
