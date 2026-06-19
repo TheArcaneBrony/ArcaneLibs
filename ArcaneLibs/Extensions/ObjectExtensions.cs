@@ -12,14 +12,15 @@ public static class ObjectExtensions {
     public static void SaveToJsonFile(this object? @object, string filename) => File.WriteAllText(filename, ToJson(@object));
 
     private static readonly Dictionary<byte, JsonSerializerOptions> OptionsCache = new();
-
-    public static string ToJson(this object? obj, bool indent = true, bool ignoreNull = false, bool unsafeContent = false) {
+    
+    public static string ToJson(this object? obj, bool indent = true, bool ignoreNull = false, bool unsafeContent = false, bool includeFields = false) {
         if (obj is null) return "";
-        var cacheKey = (byte)((indent ? 1 : 0) | (ignoreNull ? 2 : 0) | (unsafeContent ? 4 : 0));
+        var cacheKey = (byte)((indent ? 1 : 0) | (ignoreNull ? 2 : 0) | (unsafeContent ? 4 : 0) | (includeFields ? 8 : 0));
         var options = OptionsCache.GetOrCreate(cacheKey, _ => new JsonSerializerOptions {
             WriteIndented = indent,
             DefaultIgnoreCondition = ignoreNull ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never,
-            Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null
+            Encoder = unsafeContent ? JavaScriptEncoder.UnsafeRelaxedJsonEscaping : null,
+            IncludeFields = includeFields
         });
         return JsonSerializer.Serialize(obj, obj.GetType(), options);
     }
