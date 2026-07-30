@@ -62,13 +62,15 @@ public static class StringExtensions {
 
     public static string[] ParseArguments(this string text) =>
         text.Split('"')
-            .Select((element, index) => index % 2 == 0 // If even index
+            .Select((element, index) => index % 2 == 0                                    // If even index
                 ? element.Split(ArgumentSeparator, StringSplitOptions.RemoveEmptyEntries) // Split the item
-                : new[] { element }) // Keep the entire item
+                : new[] { element })                                                      // Keep the entire item
             .SelectMany(element => element).ToArray();
 
     public static IEnumerable<byte> AsBytes(this string str) => Encoding.UTF8.GetBytes(str);
 
     public static string UrlEncode(this string str) => HttpUtility.UrlEncode(str);
     public static string UrlDecode(this string str) => HttpUtility.UrlDecode(str);
+
+    public static string OrIfNullOrWhitespace(this string str, string fallback) => string.IsNullOrWhiteSpace(str) ? fallback : str;
 }
